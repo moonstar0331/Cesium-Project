@@ -42,5 +42,10 @@
       "eslint --cache --quiet",
       "prettier --write --no-config"
     ]
+  },
+  "dependencies": {
+    "@esri/arcgis-rest-common": "^1.19.2",
+    "@esri/arcgis-rest-request": "^4.2.3",
+    "@esri/arcgis-rest-routing": "^4.0.3"
   }
 }
