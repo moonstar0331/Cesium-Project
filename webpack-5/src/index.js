@@ -12,6 +12,8 @@ import {
   Cartographic,
   VerticalOrigin,
   HeightReference,
+  LabelStyle,
+  Cartesian2,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
@@ -189,6 +191,12 @@ handler.setInputAction(function (click) {
 
     // 두 번째 좌표가 선택되었을 때 Polyline 생성
     if (positions.length === 2) {
+      var spaceDistance = calculateSpaceDistance(positions[0], positions[1]);
+      console.log("spaceDistance", spaceDistance);
+
+      var planeDistance = calculatePlaneDistance(positions[0], positions[1]);
+      console.log("planeDistance", planeDistance);
+
       // polyline 생성
       viewer.entities.add({
         polyline: {
@@ -197,19 +205,23 @@ handler.setInputAction(function (click) {
           material: Color.RED,
           width: 3,
         },
+        label: {
+          text:
+            calculatePlaneDistance(positions[0], positions[1]).toString() +
+            "km",
+          font: "14pt monospace",
+          style: LabelStyle.FILL_AND_OUTLINE,
+          outlineWidth: 2,
+          verticalOrigin: VerticalOrigin.BOTTOM,
+          pixelOffset: new Cartesian2(0, -9),
+          showBackground: true,
+          position: Cartesian3.midpoint(
+            positions[0],
+            positions[1],
+            new Cartesian3(),
+          ),
+        },
       });
-
-      // var spaceDistance = (
-      //   Cartesian3.distance(positions[0], positions[1]) / 1000
-      // ).toFixed(3);
-      var spaceDistance = calculateSpaceDistance(positions[0], positions[1]);
-      console.log("spaceDistance", spaceDistance);
-
-      // const dx = positions[1].x - positions[0].x;
-      // const dy = positions[1].y - positions[0].y;
-      // var planeDistance = (Math.sqrt(dx * dx + dy * dy) / 1000).toFixed(3);
-      var planeDistance = calculatePlaneDistance(positions[0], positions[1]);
-      console.log("planeDistance", planeDistance);
 
       // 위치 초기화
       positions = [];
