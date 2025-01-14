@@ -12,7 +12,6 @@ import {
   Cartographic,
   VerticalOrigin,
   HeightReference,
-  LabelStyle,
   Cartesian2,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
@@ -205,21 +204,22 @@ handler.setInputAction(function (click) {
           material: Color.RED,
           width: 3,
         },
+      });
+
+      // label 생성
+      viewer.entities.add({
+        position: Cartesian3.midpoint(
+          positions[0],
+          positions[1],
+          new Cartesian3(),
+        ),
         label: {
-          text:
-            calculatePlaneDistance(positions[0], positions[1]).toString() +
-            "km",
-          font: "14pt monospace",
-          style: LabelStyle.FILL_AND_OUTLINE,
-          outlineWidth: 2,
-          verticalOrigin: VerticalOrigin.BOTTOM,
-          pixelOffset: new Cartesian2(0, -9),
+          text: spaceDistance,
+          font: "20px sans-serif",
+          fillColor: Color.RED,
+          outlineColor: Color.BLACK,
           showBackground: true,
-          position: Cartesian3.midpoint(
-            positions[0],
-            positions[1],
-            new Cartesian3(),
-          ),
+          pixelOffset: new Cartesian2(0, -20),
         },
       });
 
