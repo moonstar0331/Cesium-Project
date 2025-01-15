@@ -13,6 +13,7 @@ import {
   VerticalOrigin,
   HeightReference,
   Cartesian2,
+  IonGeocodeProviderType,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
@@ -48,6 +49,7 @@ function calculatePlaneDistance(position1, position2) {
 const viewer = new Viewer("cesiumContainer", {
   timeline: false,
   animation: false,
+  geocoder: IonGeocodeProviderType.GOOGLE,
   globe: false,
 });
 
@@ -76,7 +78,7 @@ try {
 
 // ArcGIS location services REST API
 const authentication = ApiKeyManager.fromKey(
-  "AAPT3NKHt6i2urmWtqOuugvr9SZ2lQsIKWCKGUFYqC7k4zVVscopv4hDV_cr72qNTv_VHqlkffhYEElHgIGai2Sul5LqciKBoE90HGcnGb-SxuiPHWYrsWwXml7qEBF0pPZzFVmo86RKwQVn62g1BD854USesrBDYH8mjNFcascbodpg17ba4h45eoD9qLJa316Wr1xAT14DjLqm8r2vLzBWOevGbQCBPvlJnarblatDblA.",
+  "AAPT3NKHt6i2urmWtqOuugvr9SZ2lQsIKWCKGUFYqC7k4zWWfKOIyubmcefDfaY2SmDzHxVDnHVwJEMWrXh4fyqIOS3GrBJ0ozJs9-kiuTNgoRbdliMzB1IGsQ5hs6jbAVLjt9MSprRTH-E12w3iOMA-DQWgioBWtu_UIQDotf3PEFt4WVgo49-7K4oNouPXmU8P45xrAfPRXEG8WetELwDfMYJQTw87r51SUMoKu4ItzBg.",
 );
 
 async function getServiceArea(cartographic) {
