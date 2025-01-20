@@ -57,13 +57,13 @@ const viewer = new Viewer("cesiumContainer", {
 });
 
 // Fly the camera to San Francisco at the given longitude, latitude, and height.
-viewer.camera.flyTo({
-  destination: Cartesian3.fromDegrees(-122.4175, 37.655, 400),
-  orientation: {
-    heading: CesiumMath.toRadians(0.0),
-    pitch: CesiumMath.toRadians(-15.0),
-  },
-});
+// viewer.camera.flyTo({
+//   destination: Cartesian3.fromDegrees(-122.4175, 37.655, 400),
+//   orientation: {
+//     heading: CesiumMath.toRadians(0.0),
+//     pitch: CesiumMath.toRadians(-15.0),
+//   },
+// });
 
 // Add Cesium OSM Buildings, a global 3D buildings layer.
 // @ts-ignore
@@ -71,19 +71,17 @@ viewer.camera.flyTo({
 // viewer.scene.primitives.add(buildingTileset);
 
 // Add a global base layer using the Google Maps Platform Map Tiles API
-async () => {
-  try {
-    // @ts-ignore
-    const tileset = await createGooglePhotorealistic3DTileset();
-    viewer.scene.primitives.add(tileset);
-  } catch (error) {
-    console.log(`Failed to load tileset: ${error}`);
-  }
-};
+try {
+  // @ts-ignore
+  const tileset = await createGooglePhotorealistic3DTileset();
+  viewer.scene.primitives.add(tileset);
+} catch (error) {
+  console.log(`Failed to load tileset: ${error}`);
+}
 
 // ArcGIS location services REST API
 const authentication = ApiKeyManager.fromKey(
-  "AAPT3NKHt6i2urmWtqOuugvr9SZ2lQsIKWCKGUFYqC7k4zWWfKOIyubmcefDfaY2SmDzHxVDnHVwJEMWrXh4fyqIOS3GrBJ0ozJs9-kiuTNgoRbdliMzB1IGsQ5hs6jbAVLjt9MSprRTH-E12w3iOMA-DQWgioBWtu_UIQDotf3PEFt4WVgo49-7K4oNouPXmU8P45xrAfPRXEG8WetELwDfMYJQTw87r51SUMoKu4ItzBg.",
+  "AAPT3NKHt6i2urmWtqOuugvr9SZ2lQsIKWCKGUFYqC7k4zUdWNz6owUHH0JUGk3Vj1qYd6XiUR9_t7xkJW4QYCYzlZ-vXzWnpSFegS4DoowtKFvOVnDGtsYtT075j53m2LsPfeYYH9sPgnXKuOAHFuAFx44KG8S3Uq6GALYgx2asCEF5GFJp8mY5QOcfMyurhxc8LUzUeIjXqhSmdI3Jmyh4fPRJAXiD4jOpxt9tDhQ5gUU.",
 );
 
 async function getServiceArea(cartographic) {
@@ -198,6 +196,7 @@ viewer.screenSpaceEventHandler.setInputAction((movement) => {
   getServiceArea(cartographic);
 }, ScreenSpaceEventType.LEFT_CLICK);
 
+// 두 좌표 간의 거리 계산
 var positions = [];
 var handler = new ScreenSpaceEventHandler(viewer.canvas);
 handler.setInputAction(function (click) {
@@ -222,6 +221,8 @@ handler.setInputAction(function (click) {
           positions: positions,
           material: Color.RED,
           width: 3,
+          clampToGround: false,
+          zIndex: Number.POSITIVE_INFINITY,
         },
       });
 
@@ -242,8 +243,64 @@ handler.setInputAction(function (click) {
         },
       });
 
+      displayDistances(spaceDistance, planeDistance, click.position);
+
       // 위치 초기화
       positions = [];
     }
   }
 }, ScreenSpaceEventType.LEFT_CLICK);
+
+function displayDistances(spaceDistance, planeDistance, clickPosition) {
+  // Create a modal to display distances
+  const modal = document.createElement("div");
+  modal.className = "distance-modal ";
+  modal.style.position = "absolute";
+  modal.style.top = `${clickPosition.y}px`;
+  modal.style.left = `${clickPosition.x}px`;
+  modal.style.padding = "20px";
+  modal.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
+  modal.style.border = "1px solid #ccc";
+  modal.style.borderRadius = "8px";
+  modal.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
+  modal.style.zIndex = "1000";
+  modal.style.fontFamily = "Arial, sans-serif";
+
+  const title = document.createElement("h3");
+  title.textContent = "Distance Information";
+  title.style.marginTop = "0";
+  modal.appendChild(title);
+
+  const spaceDistanceText = document.createElement("p");
+  spaceDistanceText.textContent = `Space Distance: ${spaceDistance} km`;
+  modal.appendChild(spaceDistanceText);
+
+  const planeDistanceText = document.createElement("p");
+  planeDistanceText.textContent = `Plane Distance: ${planeDistance} km`;
+  modal.appendChild(planeDistanceText);
+
+  const closeButton = document.createElement("button");
+  closeButton.textContent = "Close";
+  closeButton.style.marginTop = "10px";
+  closeButton.style.padding = "5px 10px";
+  closeButton.style.border = "none";
+  closeButton.style.borderRadius = "4px";
+  closeButton.style.backgroundColor = "#007bff";
+  closeButton.style.color = "white";
+  closeButton.style.cursor = "pointer";
+  closeButton.onclick = () => {
+    document.body.removeChild(modal);
+  };
+  modal.appendChild(closeButton);
+
+  document.body.appendChild(modal);
+}
+
+// Clear all polylines when the clear button is clicked
+document.getElementById("clear-btn").addEventListener("click", () => {
+  viewer.entities.removeAll();
+  const modals = document.querySelectorAll(".distance-modal");
+  modals.forEach((modal) => {
+    document.body.removeChild(modal);
+  });
+});
