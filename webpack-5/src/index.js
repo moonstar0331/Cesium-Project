@@ -35,20 +35,22 @@ const authentication = ApiKeyManager.fromKey(
   "AAPT3NKHt6i2urmWtqOuugvr9SZ2lQsIKWCKGUFYqC7k4zVjNeLLNXC6mCLfWBF9mMzLMQt1gmIZ6lUFsN7Q1YZcAq2ODv4HXltyx85JxJoLC0rhMHN3dbMBUZMjLf9z0cIGyfgiDLU--noCDwJYXDpCtGwb98iVkiHA9nb98PMs1SE5DoE1zqeunGWH8jHIM05NFSkUCpdz1DilAx2UNG-2yJYRPswK0mkU5bOhH0WiusY.",
 );
 
-function calculateSpaceDistance(position1, position2) {
-  var spaceDistance = (
-    Cartesian3.distance(position1, position2) / 1000
-  ).toFixed(3);
-
-  return spaceDistance;
-}
-
+// 2차원 거리 계산
 function calculatePlaneDistance(position1, position2) {
   const dx = position2.x - position1.x;
   const dy = position2.y - position1.y;
   var planeDistance = (Math.sqrt(dx * dx + dy * dy) / 1000).toFixed(3);
 
   return planeDistance;
+}
+
+// 3차원 거리 계산
+function calculateSpaceDistance(position1, position2) {
+  var spaceDistance = (
+    Cartesian3.distance(position1, position2) / 1000
+  ).toFixed(3);
+
+  return spaceDistance;
 }
 
 const viewer = new Viewer("cesiumContainer", {
@@ -113,45 +115,95 @@ async function getServiceArea(cartographic) {
 
   // Style the results
   const entities = dataSource.entities.values;
+  let serviceAreaInfo = {
+    "0-5 minutes": { count: 0, color: "rgba(149, 223, 255, 0.5)" },
+    "5-10 minutes": { count: 0, color: "rgba(102, 204, 255, 0.5)" },
+    "10+ minutes": { count: 0, color: "rgba(51, 153, 255, 0.5)" },
+  };
 
   for (let i = 0; i < entities.length; i++) {
     const feature = entities[i];
-    // feature.polygon.outline = false;
     feature.polygon.outline = new ConstantProperty(false);
 
+    let color, description;
     if (feature.properties.FromBreak == 0) {
-      // feature.polygon.material = Color.fromHsl(0.5833, 0.8, 0.9, 0.5);
-      feature.polygon.material = new ColorMaterialProperty(
-        Color.fromHsl(0.5833, 0.8, 0.9, 0.5),
-      );
+      color = Color.fromHsl(0.5833, 0.8, 0.9, 0.5);
+      description = "0-5 minutes";
     } else if (feature.properties.FromBreak == 5) {
-      // feature.polygon.material = Color.fromHsl(0.5833, 0.9, 0.7, 0.5);
-      feature.polygon.material = new ColorMaterialProperty(
-        Color.fromHsl(0.5833, 0.9, 0.7, 0.5),
-      );
+      color = Color.fromHsl(0.5833, 0.9, 0.7, 0.5);
+      description = "5-10 minutes";
     } else {
-      // feature.polygon.material = Color.fromHsl(0.5833, 1.0, 0.4, 0.5);
-      feature.polygon.material = new ColorMaterialProperty(
-        Color.fromHsl(0.5833, 1.0, 0.4, 0.5),
-      );
+      color = Color.fromHsl(0.5833, 1.0, 0.4, 0.5);
+      description = "10+ minutes";
     }
+    feature.polygon.material = new ColorMaterialProperty(color);
+    serviceAreaInfo[description].count++;
   }
 
   const scene = viewer.scene;
   scene.invertClassification = true;
   scene.invertClassificationColor = new Color(0.4, 0.4, 0.4, 1.0);
+
+  displayServiceAreaInfo(serviceAreaInfo);
 }
 
-// Travel Time 계산 기능
-document.getElementById("travel-time").addEventListener("click", () => {
-  var handler = new ScreenSpaceEventHandler(viewer.canvas);
+function displayServiceAreaInfo(serviceAreaInfo) {
+  const modal = document.createElement("div");
+  modal.className = "service-area-modal";
+  modal.style.position = "fixed";
+  modal.style.top = "50%";
+  modal.style.right = "20px";
+  modal.style.transform = "translateY(-50%)";
+  modal.style.width = "300px";
+  modal.style.padding = "20px";
+  modal.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
+  modal.style.border = "1px solid #ccc";
+  modal.style.borderRadius = "8px";
+  modal.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
+  modal.style.zIndex = "1000";
+  modal.style.fontFamily = "Arial, sans-serif";
 
+  const title = document.createElement("h3");
+  title.textContent = "Service Area Information";
+  title.style.marginTop = "0";
+  modal.appendChild(title);
+
+  for (const [description, info] of Object.entries(serviceAreaInfo)) {
+    const infoText = document.createElement("p");
+    infoText.innerHTML = `<span style="background-color: ${info.color}; padding: 2px 5px; border-radius: 3px;">&nbsp;&nbsp;&nbsp;&nbsp;</span> ${description}: ${info.count} areas`;
+    modal.appendChild(infoText);
+  }
+
+  const closeButton = document.createElement("button");
+  closeButton.textContent = "Close";
+  closeButton.style.position = "absolute";
+  closeButton.style.top = "10px";
+  closeButton.style.right = "10px";
+  closeButton.style.padding = "5px 10px";
+  closeButton.style.border = "none";
+  closeButton.style.borderRadius = "4px";
+  closeButton.style.backgroundColor = "#007bff";
+  closeButton.style.color = "white";
+  closeButton.style.cursor = "pointer";
+  closeButton.onclick = () => {
+    document.body.removeChild(modal);
+  };
+  modal.appendChild(closeButton);
+
+  document.body.appendChild(modal);
+}
+
+// Travel Time 계산
+document.getElementById("travel-time").addEventListener("click", () => {
   // 여행 시간 구분 기능 OFF
-  handler.setInputAction(function (click) {
+  viewer.screenSpaceEventHandler.setInputAction((click) => {
     viewer.dataSources.removeAll();
     viewer.scene.invertClassification = false;
     marker.show = false;
-    viewer.screenSpaceEventHandler.destroy();
+    // viewer.screenSpaceEventHandler.destroy();
+    viewer.screenSpaceEventHandler.removeInputAction(
+      ScreenSpaceEventType.LEFT_CLICK,
+    );
   }, ScreenSpaceEventType.RIGHT_CLICK);
 
   const marker = viewer.entities.add({
