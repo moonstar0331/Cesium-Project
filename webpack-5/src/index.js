@@ -181,54 +181,57 @@ viewer.screenSpaceEventHandler.setInputAction((movement) => {
 
 // 두 좌표 간의 거리 계산
 var positions = [];
-var handler = new ScreenSpaceEventHandler(viewer.canvas);
-handler.setInputAction(function (click) {
-  var pickedPosition = viewer.scene.pickPosition(click.position);
+document.getElementById("distance-btn").addEventListener("click", () => {
+  var handler = new ScreenSpaceEventHandler(viewer.canvas);
+  handler.setInputAction(function (click) {
+    var pickedPosition = viewer.scene.pickPosition(click.position);
 
-  // 클릭한 좌표가 유효한지 확인
-  if (defined(pickedPosition)) {
-    positions.push(pickedPosition);
+    // 클릭한 좌표가 유효한지 확인
+    if (defined(pickedPosition)) {
+      positions.push(pickedPosition);
 
-    // 두 번째 좌표가 선택되었을 때 Polyline 생성
-    if (positions.length === 2) {
-      var spaceDistance = calculateSpaceDistance(positions[0], positions[1]);
-      var planeDistance = calculatePlaneDistance(positions[0], positions[1]);
+      // 두 번째 좌표가 선택되었을 때 Polyline 생성
+      if (positions.length === 2) {
+        var spaceDistance = calculateSpaceDistance(positions[0], positions[1]);
+        var planeDistance = calculatePlaneDistance(positions[0], positions[1]);
 
-      // polyline 생성
-      viewer.entities.add({
-        polyline: {
-          positions: positions,
-          material: Color.RED,
-          width: 5,
-          clampToGround: false,
-          zIndex: Number.POSITIVE_INFINITY,
-        },
-      });
+        // polyline 생성
+        viewer.entities.add({
+          polyline: {
+            positions: positions,
+            material: Color.RED,
+            width: 5,
+            clampToGround: false,
+            zIndex: Number.POSITIVE_INFINITY,
+          },
+        });
 
-      // label 생성
-      viewer.entities.add({
-        position: Cartesian3.midpoint(
-          positions[0],
-          positions[1],
-          new Cartesian3(),
-        ),
-        label: {
-          text: spaceDistance + "km",
-          font: "20px sans-serif",
-          fillColor: Color.RED,
-          outlineColor: Color.BLACK,
-          showBackground: true,
-          pixelOffset: new Cartesian2(0, -20),
-        },
-      });
+        // label 생성
+        viewer.entities.add({
+          position: Cartesian3.midpoint(
+            positions[0],
+            positions[1],
+            new Cartesian3(),
+          ),
+          label: {
+            text: spaceDistance + "km",
+            font: "20px sans-serif",
+            fillColor: Color.RED,
+            outlineColor: Color.BLACK,
+            showBackground: true,
+            pixelOffset: new Cartesian2(0, -20),
+          },
+        });
 
-      displayDistances(spaceDistance, planeDistance, click.position);
+        displayDistances(spaceDistance, planeDistance, click.position);
 
-      // 위치 초기화
-      positions = [];
+        // 위치 초기화
+        positions = [];
+        handler.destroy();
+      }
     }
-  }
-}, ScreenSpaceEventType.LEFT_CLICK);
+  }, ScreenSpaceEventType.LEFT_CLICK);
+});
 
 function displayDistances(spaceDistance, planeDistance, clickPosition) {
   // Create a modal to display distances
