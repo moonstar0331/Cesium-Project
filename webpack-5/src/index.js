@@ -32,7 +32,7 @@ Ion.defaultAccessToken =
 
 // ArcGIS location services REST API
 const authentication = ApiKeyManager.fromKey(
-  "AAPT3NKHt6i2urmWtqOuugvr9SZ2lQsIKWCKGUFYqC7k4zUdWNz6owUHH0JUGk3Vj1qYd6XiUR9_t7xkJW4QYCYzlZ-vXzWnpSFegS4DoowtKFvOVnDGtsYtT075j53m2LsPfeYYH9sPgnXKuOAHFuAFx44KG8S3Uq6GALYgx2asCEF5GFJp8mY5QOcfMyurhxc8LUzUeIjXqhSmdI3Jmyh4fPRJAXiD4jOpxt9tDhQ5gUU.",
+  "AAPT3NKHt6i2urmWtqOuugvr9SZ2lQsIKWCKGUFYqC7k4zVjNeLLNXC6mCLfWBF9mMzLMQt1gmIZ6lUFsN7Q1YZcAq2ODv4HXltyx85JxJoLC0rhMHN3dbMBUZMjLf9z0cIGyfgiDLU--noCDwJYXDpCtGwb98iVkiHA9nb98PMs1SE5DoE1zqeunGWH8jHIM05NFSkUCpdz1DilAx2UNG-2yJYRPswK0mkU5bOhH0WiusY.",
 );
 
 function calculateSpaceDistance(position1, position2) {
@@ -66,6 +66,14 @@ try {
 } catch (error) {
   console.log(`Failed to load tileset: ${error}`);
 }
+
+// At a location in San Francisco
+viewer.camera.setView({
+  destination: Cartesian3.fromDegrees(-122.38329, 37.74015, 16000),
+  orientation: {
+    pitch: CesiumMath.toRadians(-70.0),
+  },
+});
 
 async function getServiceArea(cartographic) {
   const coordinates = [
@@ -134,55 +142,94 @@ async function getServiceArea(cartographic) {
   scene.invertClassificationColor = new Color(0.4, 0.4, 0.4, 1.0);
 }
 
-// At a location in San Francisco
-viewer.camera.setView({
-  destination: Cartesian3.fromDegrees(-122.38329, 37.74015, 16000),
-  orientation: {
-    pitch: CesiumMath.toRadians(-70.0),
-  },
-});
-const cartesian = Cartesian3.fromDegrees(-122.39429, 37.78988);
-getServiceArea(Cartographic.fromCartesian(cartesian));
+document.getElementById("travel-time").addEventListener("click", () => {
+  var handler = new ScreenSpaceEventHandler(viewer.canvas);
 
-const marker = viewer.entities.add({
-  name: "start",
-  billboard: {
-    verticalOrigin: VerticalOrigin.BOTTOM,
-    heightReference: HeightReference.CLAMP_TO_GROUND,
-    image: "./marker.svg",
-    disableDepthTestDistance: Number.POSITIVE_INFINITY,
-    scale: 1,
-  },
-});
-
-// marker.position = cartesian;
-marker.position = new ConstantPositionProperty(cartesian);
-
-// Add utility to our app by allowing the user to choose the position used as input for the spatial query.
-viewer.screenSpaceEventHandler.setInputAction((movement) => {
-  viewer.dataSources.removeAll();
-  viewer.scene.invertClassification = false;
-  marker.show = false;
-
-  const pickedPosition = viewer.scene.pickPosition(movement.position);
-
-  if (!defined(pickedPosition)) {
+  // 여행 시간 구분 기능 OFF
+  handler.setInputAction(function (click) {
     return;
-  }
+  }, ScreenSpaceEventType.RIGHT_CLICK);
 
-  // marker.position = pickedPosition;
-  marker.position = new ConstantPositionProperty();
-  marker.show = true;
-  viewer.scene.invertClassification = true;
+  const marker = viewer.entities.add({
+    name: "pickedPosition",
+    billboard: {
+      verticalOrigin: VerticalOrigin.BOTTOM,
+      heightReference: HeightReference.CLAMP_TO_GROUND,
+      image: "./marker.svg",
+      disableDepthTestDistance: Number.POSITIVE_INFINITY,
+      scale: 1,
+    },
+  });
 
-  const cartographic = Cartographic.fromCartesian(pickedPosition);
-  getServiceArea(cartographic);
-}, ScreenSpaceEventType.LEFT_CLICK);
+  viewer.screenSpaceEventHandler.setInputAction((movement) => {
+    viewer.dataSources.removeAll();
+    viewer.scene.invertClassification = false;
+    marker.show = false;
+
+    const pickedPosition = viewer.scene.pickPosition(movement.position);
+
+    if (!defined(pickedPosition)) {
+      return;
+    }
+
+    marker.position = new ConstantPositionProperty(pickedPosition);
+    marker.show = true;
+    viewer.scene.invertClassification = true;
+
+    const cartographic = Cartographic.fromCartesian(pickedPosition);
+    getServiceArea(cartographic);
+  }, ScreenSpaceEventType.LEFT_CLICK);
+});
+
+// const cartesian = Cartesian3.fromDegrees(-122.39429, 37.78988);
+// getServiceArea(Cartographic.fromCartesian(cartesian));
+
+// const marker = viewer.entities.add({
+//   name: "start",
+//   billboard: {
+//     verticalOrigin: VerticalOrigin.BOTTOM,
+//     heightReference: HeightReference.CLAMP_TO_GROUND,
+//     image: "./marker.svg",
+//     disableDepthTestDistance: Number.POSITIVE_INFINITY,
+//     scale: 1,
+//   },
+// });
+
+// // marker.position = cartesian;
+// marker.position = new ConstantPositionProperty(cartesian);
+
+// // Add utility to our app by allowing the user to choose the position used as input for the spatial query.
+// viewer.screenSpaceEventHandler.setInputAction((movement) => {
+//   viewer.dataSources.removeAll();
+//   viewer.scene.invertClassification = false;
+//   marker.show = false;
+
+//   const pickedPosition = viewer.scene.pickPosition(movement.position);
+
+//   if (!defined(pickedPosition)) {
+//     return;
+//   }
+
+//   // marker.position = pickedPosition;
+//   marker.position = new ConstantPositionProperty();
+//   marker.show = true;
+//   viewer.scene.invertClassification = true;
+
+//   const cartographic = Cartographic.fromCartesian(pickedPosition);
+//   getServiceArea(cartographic);
+// }, ScreenSpaceEventType.LEFT_CLICK);
 
 // 두 좌표 간의 거리 계산
 var positions = [];
 document.getElementById("distance-btn").addEventListener("click", () => {
   var handler = new ScreenSpaceEventHandler(viewer.canvas);
+
+  // 거리 계산 기능 OFF
+  handler.setInputAction(function (click) {
+    positions = [];
+    handler.destroy();
+  }, ScreenSpaceEventType.RIGHT_CLICK);
+
   handler.setInputAction(function (click) {
     var pickedPosition = viewer.scene.pickPosition(click.position);
 
@@ -236,10 +283,13 @@ document.getElementById("distance-btn").addEventListener("click", () => {
 function displayDistances(spaceDistance, planeDistance, clickPosition) {
   // Create a modal to display distances
   const modal = document.createElement("div");
-  modal.className = "distance-modal ";
-  modal.style.position = "absolute";
-  modal.style.top = `${clickPosition.y}px`;
-  modal.style.left = `${clickPosition.x}px`;
+  modal.className = "distance-modal";
+  modal.style.position = "fixed";
+  modal.style.top = "50%";
+  modal.style.right = "20px";
+  modal.style.transform = "translateY(-50%)";
+  modal.style.width = "300px";
+  modal.style.height = "1000px";
   modal.style.padding = "20px";
   modal.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
   modal.style.border = "1px solid #ccc";
@@ -263,7 +313,9 @@ function displayDistances(spaceDistance, planeDistance, clickPosition) {
 
   const closeButton = document.createElement("button");
   closeButton.textContent = "Close";
-  closeButton.style.marginTop = "10px";
+  closeButton.style.position = "absolute";
+  closeButton.style.top = "10px";
+  closeButton.style.right = "10px";
   closeButton.style.padding = "5px 10px";
   closeButton.style.border = "none";
   closeButton.style.borderRadius = "4px";
@@ -281,8 +333,13 @@ function displayDistances(spaceDistance, planeDistance, clickPosition) {
 // Clear all polylines when the clear button is clicked
 document.getElementById("clear-btn").addEventListener("click", () => {
   viewer.entities.removeAll();
+  closeModal();
+});
+
+// 모달 창 닫기 함수
+function closeModal() {
   const modals = document.querySelectorAll(".distance-modal");
   modals.forEach((modal) => {
     document.body.removeChild(modal);
   });
-});
+}

@@ -8,12 +8,7 @@ body,
   overflow: hidden;
 }
 
-#distance-btn {
-  z-index: 1;
-  position: fixed;
-  top: 5px;
-  left: 5px;
-  background-color: skyblue; /* Green */
+.btn {
   border: none;
   color: white;
   padding: 15px 32px;
@@ -24,6 +19,14 @@ body,
   margin: 4px 2px;
   cursor: pointer;
   border-radius: 12px;
+}
+
+#distance-btn {
+  z-index: 1;
+  position: fixed;
+  top: 5px;
+  left: 5px;
+  background-color: skyblue;
 }
 
 #toggle-building {
@@ -32,32 +35,20 @@ body,
   top: 5px;
   left: 200px;
   background-color: #4caf50; /* Green */
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 12px;
+}
+
+#travel-time {
+  z-index: 1;
+  position: fixed;
+  top: 5px;
+  left: 378px;
+  background-color: gray;
 }
 
 #clear-btn {
   z-index: 1;
   position: fixed;
   top: 5px;
-  left: 378px;
-  background-color: red; /* Green */
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 12px;
+  left: 600px;
+  background-color: red;
 }
