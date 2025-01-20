@@ -30,6 +30,11 @@ import { serviceArea } from "@esri/arcgis-rest-routing";
 Ion.defaultAccessToken =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhNzQ0OWUzMS1lMTdiLTQ4ZWYtOTYwMi1kYjZkNjE4MjE2MzQiLCJpZCI6MjY3MDE5LCJpYXQiOjE3MzYxNDg2ODR9.FZHYOYD25Snz3ZYimh5wNaATYbXHoB6p79gshGItaek";
 
+// ArcGIS location services REST API
+const authentication = ApiKeyManager.fromKey(
+  "AAPT3NKHt6i2urmWtqOuugvr9SZ2lQsIKWCKGUFYqC7k4zUdWNz6owUHH0JUGk3Vj1qYd6XiUR9_t7xkJW4QYCYzlZ-vXzWnpSFegS4DoowtKFvOVnDGtsYtT075j53m2LsPfeYYH9sPgnXKuOAHFuAFx44KG8S3Uq6GALYgx2asCEF5GFJp8mY5QOcfMyurhxc8LUzUeIjXqhSmdI3Jmyh4fPRJAXiD4jOpxt9tDhQ5gUU.",
+);
+
 function calculateSpaceDistance(position1, position2) {
   var spaceDistance = (
     Cartesian3.distance(position1, position2) / 1000
@@ -46,29 +51,12 @@ function calculatePlaneDistance(position1, position2) {
   return planeDistance;
 }
 
-// const viewer = new Viewer("cesiumContainer", {
-//   terrain: Terrain.fromWorldTerrain(),
-// });
 const viewer = new Viewer("cesiumContainer", {
   timeline: true,
   animation: true,
   geocoder: IonGeocodeProviderType.GOOGLE,
   globe: false,
 });
-
-// Fly the camera to San Francisco at the given longitude, latitude, and height.
-// viewer.camera.flyTo({
-//   destination: Cartesian3.fromDegrees(-122.4175, 37.655, 400),
-//   orientation: {
-//     heading: CesiumMath.toRadians(0.0),
-//     pitch: CesiumMath.toRadians(-15.0),
-//   },
-// });
-
-// Add Cesium OSM Buildings, a global 3D buildings layer.
-// @ts-ignore
-// const buildingTileset = await createOsmBuildingsAsync();
-// viewer.scene.primitives.add(buildingTileset);
 
 // Add a global base layer using the Google Maps Platform Map Tiles API
 try {
@@ -78,11 +66,6 @@ try {
 } catch (error) {
   console.log(`Failed to load tileset: ${error}`);
 }
-
-// ArcGIS location services REST API
-const authentication = ApiKeyManager.fromKey(
-  "AAPT3NKHt6i2urmWtqOuugvr9SZ2lQsIKWCKGUFYqC7k4zUdWNz6owUHH0JUGk3Vj1qYd6XiUR9_t7xkJW4QYCYzlZ-vXzWnpSFegS4DoowtKFvOVnDGtsYtT075j53m2LsPfeYYH9sPgnXKuOAHFuAFx44KG8S3Uq6GALYgx2asCEF5GFJp8mY5QOcfMyurhxc8LUzUeIjXqhSmdI3Jmyh4fPRJAXiD4jOpxt9tDhQ5gUU.",
-);
 
 async function getServiceArea(cartographic) {
   const coordinates = [
@@ -209,18 +192,14 @@ handler.setInputAction(function (click) {
     // 두 번째 좌표가 선택되었을 때 Polyline 생성
     if (positions.length === 2) {
       var spaceDistance = calculateSpaceDistance(positions[0], positions[1]);
-      console.log("spaceDistance", spaceDistance);
-
       var planeDistance = calculatePlaneDistance(positions[0], positions[1]);
-      console.log("planeDistance", planeDistance);
 
       // polyline 생성
       viewer.entities.add({
         polyline: {
-          // positions: Cartesian3.fromRadiansArray(positions),
           positions: positions,
           material: Color.RED,
-          width: 3,
+          width: 5,
           clampToGround: false,
           zIndex: Number.POSITIVE_INFINITY,
         },
