@@ -14,6 +14,9 @@ import {
   HeightReference,
   Cartesian2,
   IonGeocodeProviderType,
+  ConstantProperty,
+  ColorMaterialProperty,
+  ConstantPositionProperty,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
@@ -29,15 +32,15 @@ Ion.defaultAccessToken =
 
 function calculateSpaceDistance(position1, position2) {
   var spaceDistance = (
-    Cartesian3.distance(positions[0], positions[1]) / 1000
+    Cartesian3.distance(position1, position2) / 1000
   ).toFixed(3);
 
   return spaceDistance;
 }
 
 function calculatePlaneDistance(position1, position2) {
-  const dx = positions[1].x - positions[0].x;
-  const dy = positions[1].y - positions[0].y;
+  const dx = position2.x - position1.x;
+  const dy = position2.y - position1.y;
   var planeDistance = (Math.sqrt(dx * dx + dy * dy) / 1000).toFixed(3);
 
   return planeDistance;
@@ -68,13 +71,15 @@ viewer.camera.flyTo({
 // viewer.scene.primitives.add(buildingTileset);
 
 // Add a global base layer using the Google Maps Platform Map Tiles API
-try {
-  // @ts-ignore
-  const tileset = await createGooglePhotorealistic3DTileset();
-  viewer.scene.primitives.add(tileset);
-} catch (error) {
-  console.log(`Failed to load tileset: ${error}`);
-}
+async () => {
+  try {
+    // @ts-ignore
+    const tileset = await createGooglePhotorealistic3DTileset();
+    viewer.scene.primitives.add(tileset);
+  } catch (error) {
+    console.log(`Failed to load tileset: ${error}`);
+  }
+};
 
 // ArcGIS location services REST API
 const authentication = ApiKeyManager.fromKey(
@@ -122,14 +127,24 @@ async function getServiceArea(cartographic) {
 
   for (let i = 0; i < entities.length; i++) {
     const feature = entities[i];
-    feature.polygon.outline = false;
+    // feature.polygon.outline = false;
+    feature.polygon.outline = new ConstantProperty(false);
 
     if (feature.properties.FromBreak == 0) {
-      feature.polygon.material = Color.fromHsl(0.5833, 0.8, 0.9, 0.5);
+      // feature.polygon.material = Color.fromHsl(0.5833, 0.8, 0.9, 0.5);
+      feature.polygon.material = new ColorMaterialProperty(
+        Color.fromHsl(0.5833, 0.8, 0.9, 0.5),
+      );
     } else if (feature.properties.FromBreak == 5) {
-      feature.polygon.material = Color.fromHsl(0.5833, 0.9, 0.7, 0.5);
+      // feature.polygon.material = Color.fromHsl(0.5833, 0.9, 0.7, 0.5);
+      feature.polygon.material = new ColorMaterialProperty(
+        Color.fromHsl(0.5833, 0.9, 0.7, 0.5),
+      );
     } else {
-      feature.polygon.material = Color.fromHsl(0.5833, 1.0, 0.4, 0.5);
+      // feature.polygon.material = Color.fromHsl(0.5833, 1.0, 0.4, 0.5);
+      feature.polygon.material = new ColorMaterialProperty(
+        Color.fromHsl(0.5833, 1.0, 0.4, 0.5),
+      );
     }
   }
 
@@ -159,7 +174,8 @@ const marker = viewer.entities.add({
   },
 });
 
-marker.position = cartesian;
+// marker.position = cartesian;
+marker.position = new ConstantPositionProperty(cartesian);
 
 // Add utility to our app by allowing the user to choose the position used as input for the spatial query.
 viewer.screenSpaceEventHandler.setInputAction((movement) => {
@@ -173,7 +189,8 @@ viewer.screenSpaceEventHandler.setInputAction((movement) => {
     return;
   }
 
-  marker.position = pickedPosition;
+  // marker.position = pickedPosition;
+  marker.position = new ConstantPositionProperty();
   marker.show = true;
   viewer.scene.invertClassification = true;
 
