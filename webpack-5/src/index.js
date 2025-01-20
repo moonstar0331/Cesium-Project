@@ -206,6 +206,7 @@ document.getElementById("travel-time").addEventListener("click", () => {
     );
   }, ScreenSpaceEventType.RIGHT_CLICK);
 
+  // 마커 엔티티 생성
   const marker = viewer.entities.add({
     name: "pickedPosition",
     billboard: {
@@ -217,6 +218,7 @@ document.getElementById("travel-time").addEventListener("click", () => {
     },
   });
 
+  // 마커 위치 및 여행 시간 분석 추가
   viewer.screenSpaceEventHandler.setInputAction((movement) => {
     viewer.dataSources.removeAll();
     viewer.scene.invertClassification = false;
