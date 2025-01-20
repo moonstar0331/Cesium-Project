@@ -36,8 +36,8 @@ function calculateSpaceDistance(position1, position2) {
 }
 
 function calculatePlaneDistance(position1, position2) {
-  const dx = Math.abs(positions[1].x - positions[0].x);
-  const dy = Math.abs(positions[1].y - positions[0].y);
+  const dx = positions[1].x - positions[0].x;
+  const dy = positions[1].y - positions[0].y;
   var planeDistance = (Math.sqrt(dx * dx + dy * dy) / 1000).toFixed(3);
 
   return planeDistance;
@@ -47,8 +47,8 @@ function calculatePlaneDistance(position1, position2) {
 //   terrain: Terrain.fromWorldTerrain(),
 // });
 const viewer = new Viewer("cesiumContainer", {
-  timeline: false,
-  animation: false,
+  timeline: true,
+  animation: true,
   geocoder: IonGeocodeProviderType.GOOGLE,
   globe: false,
 });
@@ -216,7 +216,7 @@ handler.setInputAction(function (click) {
           new Cartesian3(),
         ),
         label: {
-          text: spaceDistance,
+          text: spaceDistance + "km",
           font: "20px sans-serif",
           fillColor: Color.RED,
           outlineColor: Color.BLACK,
