@@ -142,12 +142,16 @@ async function getServiceArea(cartographic) {
   scene.invertClassificationColor = new Color(0.4, 0.4, 0.4, 1.0);
 }
 
+// Travel Time 계산 기능
 document.getElementById("travel-time").addEventListener("click", () => {
   var handler = new ScreenSpaceEventHandler(viewer.canvas);
 
   // 여행 시간 구분 기능 OFF
   handler.setInputAction(function (click) {
-    return;
+    viewer.dataSources.removeAll();
+    viewer.scene.invertClassification = false;
+    marker.show = false;
+    viewer.screenSpaceEventHandler.destroy();
   }, ScreenSpaceEventType.RIGHT_CLICK);
 
   const marker = viewer.entities.add({
@@ -180,44 +184,6 @@ document.getElementById("travel-time").addEventListener("click", () => {
     getServiceArea(cartographic);
   }, ScreenSpaceEventType.LEFT_CLICK);
 });
-
-// const cartesian = Cartesian3.fromDegrees(-122.39429, 37.78988);
-// getServiceArea(Cartographic.fromCartesian(cartesian));
-
-// const marker = viewer.entities.add({
-//   name: "start",
-//   billboard: {
-//     verticalOrigin: VerticalOrigin.BOTTOM,
-//     heightReference: HeightReference.CLAMP_TO_GROUND,
-//     image: "./marker.svg",
-//     disableDepthTestDistance: Number.POSITIVE_INFINITY,
-//     scale: 1,
-//   },
-// });
-
-// // marker.position = cartesian;
-// marker.position = new ConstantPositionProperty(cartesian);
-
-// // Add utility to our app by allowing the user to choose the position used as input for the spatial query.
-// viewer.screenSpaceEventHandler.setInputAction((movement) => {
-//   viewer.dataSources.removeAll();
-//   viewer.scene.invertClassification = false;
-//   marker.show = false;
-
-//   const pickedPosition = viewer.scene.pickPosition(movement.position);
-
-//   if (!defined(pickedPosition)) {
-//     return;
-//   }
-
-//   // marker.position = pickedPosition;
-//   marker.position = new ConstantPositionProperty();
-//   marker.show = true;
-//   viewer.scene.invertClassification = true;
-
-//   const cartographic = Cartographic.fromCartesian(pickedPosition);
-//   getServiceArea(cartographic);
-// }, ScreenSpaceEventType.LEFT_CLICK);
 
 // 두 좌표 간의 거리 계산
 var positions = [];
