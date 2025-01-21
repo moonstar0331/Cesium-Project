@@ -396,12 +396,59 @@ document
   });
 
 const box = document.getElementById("cesiumContainer");
-const x = document.getElementById("x");
-const y = document.getElementById("y");
+const lat = document.getElementById("lat");
+const lng = document.getElementById("lng");
 
 function updateDisplay(event) {
-  x.innerHTML = event.x;
-  y.innerHTML = event.y;
+  // lat.innerHTML = event.x;
+  // lng.innerHTML = event.y;
+  const canvas = viewer.scene.canvas;
+  const cartesian = viewer.camera.pickEllipsoid(
+    new Cartesian2(event.clientX, event.clientY),
+    viewer.scene.globe.ellipsoid,
+  );
+  if (cartesian) {
+    const cartographic = Cartographic.fromCartesian(cartesian);
+    const longitude = CesiumMath.toDegrees(cartographic.longitude).toFixed(6);
+    const latitude = CesiumMath.toDegrees(cartographic.latitude).toFixed(6);
+    lat.innerHTML = latitude;
+    lng.innerHTML = longitude;
+
+    const coord = viewer.entities.getById("coordinate");
+    if (defined(coord) && viewer.entities.contains(coord)) {
+      viewer.entities.removeById("coordinate");
+    }
+
+    viewer.entities.add({
+      id: "coordinate",
+      position: cartesian,
+      label: {
+        text: `${latitude}, ${longitude}`,
+        font: "20px sans-serif",
+        fillColor: Color.RED,
+        outlineColor: Color.BLACK,
+        showBackground: true,
+        pixelOffset: new Cartesian2(0, -20),
+      },
+    });
+  }
 }
 
 box.addEventListener("mousemove", updateDisplay, false);
+
+// // label 생성
+// viewer.entities.add({
+//   position: Cartesian3.midpoint(
+//     positions[0],
+//     positions[1],
+//     new Cartesian3(),
+//   ),
+//   label: {
+//     text: spaceDistance + "km",
+//     font: "20px sans-serif",
+//     fillColor: Color.RED,
+//     outlineColor: Color.BLACK,
+//     showBackground: true,
+//     pixelOffset: new Cartesian2(0, -20),
+//   },
+// });
