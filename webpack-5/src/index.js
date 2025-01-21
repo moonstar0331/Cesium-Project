@@ -69,6 +69,7 @@ function calculateSpaceDistance(position1, position2) {
 const viewer = new Viewer("cesiumContainer", {
   terrain: Terrain.fromWorldTerrain(),
 });
+viewer.scene.globe.depthTestAgainstTerrain = false;
 
 // Add a global base layer using the Google Maps Platform Map Tiles API
 var buildingsTileset;
@@ -400,8 +401,6 @@ const lat = document.getElementById("lat");
 const lng = document.getElementById("lng");
 
 function updateDisplay(event) {
-  // lat.innerHTML = event.x;
-  // lng.innerHTML = event.y;
   const canvas = viewer.scene.canvas;
   const cartesian = viewer.camera.pickEllipsoid(
     new Cartesian2(event.clientX, event.clientY),
@@ -409,8 +408,8 @@ function updateDisplay(event) {
   );
   if (cartesian) {
     const cartographic = Cartographic.fromCartesian(cartesian);
-    const longitude = CesiumMath.toDegrees(cartographic.longitude).toFixed(6);
-    const latitude = CesiumMath.toDegrees(cartographic.latitude).toFixed(6);
+    const longitude = CesiumMath.toDegrees(cartographic.longitude).toFixed(4);
+    const latitude = CesiumMath.toDegrees(cartographic.latitude).toFixed(4);
     lat.innerHTML = latitude;
     lng.innerHTML = longitude;
 
@@ -435,20 +434,3 @@ function updateDisplay(event) {
 }
 
 box.addEventListener("mousemove", updateDisplay, false);
-
-// // label 생성
-// viewer.entities.add({
-//   position: Cartesian3.midpoint(
-//     positions[0],
-//     positions[1],
-//     new Cartesian3(),
-//   ),
-//   label: {
-//     text: spaceDistance + "km",
-//     font: "20px sans-serif",
-//     fillColor: Color.RED,
-//     outlineColor: Color.BLACK,
-//     showBackground: true,
-//     pixelOffset: new Cartesian2(0, -20),
-//   },
-// });
