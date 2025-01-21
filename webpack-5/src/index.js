@@ -435,7 +435,6 @@ document.getElementById("elevation").addEventListener("click", () => {
 
 // Elavation Coordinate Label Display Function
 function updateDisplay(event) {
-  const canvas = viewer.scene.canvas;
   const cartesian = viewer.camera.pickEllipsoid(
     new Cartesian2(event.clientX, event.clientY),
     viewer.scene.globe.ellipsoid,
@@ -444,25 +443,25 @@ function updateDisplay(event) {
     const cartographic = Cartographic.fromCartesian(cartesian);
     const longitude = CesiumMath.toDegrees(cartographic.longitude).toFixed(4);
     const latitude = CesiumMath.toDegrees(cartographic.latitude).toFixed(4);
-    lat.innerHTML = latitude;
-    lng.innerHTML = longitude;
 
     const coord = viewer.entities.getById("coordinate");
-    if (defined(coord) && viewer.entities.contains(coord)) {
-      viewer.entities.removeById("coordinate");
-    }
 
-    viewer.entities.add({
-      id: "coordinate",
-      position: cartesian,
-      label: {
-        text: `${latitude}, ${longitude}`,
-        font: "20px sans-serif",
-        fillColor: Color.RED,
-        outlineColor: Color.BLACK,
-        showBackground: true,
-        pixelOffset: new Cartesian2(0, -20),
-      },
-    });
+    if (defined(coord) && viewer.entities.contains(coord)) {
+      coord.position = new ConstantPositionProperty(cartesian);
+      coord.label.text = new ConstantProperty(`${latitude}, ${longitude}`);
+    } else {
+      viewer.entities.add({
+        id: "coordinate",
+        position: cartesian,
+        label: {
+          text: `${latitude}, ${longitude}`,
+          font: "20px sans-serif",
+          fillColor: Color.RED,
+          outlineColor: Color.BLACK,
+          showBackground: true,
+          pixelOffset: new Cartesian2(0, -20),
+        },
+      });
+    }
   }
 }
