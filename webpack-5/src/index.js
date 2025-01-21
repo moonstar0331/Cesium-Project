@@ -17,6 +17,11 @@ import {
   ConstantProperty,
   ColorMaterialProperty,
   ConstantPositionProperty,
+  IonResource,
+  ClassificationType,
+  createOsmBuildingsAsync,
+  Cesium3DTileStyle,
+  Cesium3DTileset,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
@@ -32,7 +37,7 @@ Ion.defaultAccessToken =
 
 // ArcGIS location services REST API
 const authentication = ApiKeyManager.fromKey(
-  "AAPT3NKHt6i2urmWtqOuugvr9SZ2lQsIKWCKGUFYqC7k4zVjNeLLNXC6mCLfWBF9mMzLMQt1gmIZ6lUFsN7Q1YZcAq2ODv4HXltyx85JxJoLC0rhMHN3dbMBUZMjLf9z0cIGyfgiDLU--noCDwJYXDpCtGwb98iVkiHA9nb98PMs1SE5DoE1zqeunGWH8jHIM05NFSkUCpdz1DilAx2UNG-2yJYRPswK0mkU5bOhH0WiusY.",
+  "AAPT3NKHt6i2urmWtqOuugvr9SZ2lQsIKWCKGUFYqC7k4zWYj4L7KghRPfM9GrAtIfKJIvtDkHEFmaegJXtSIw9oemOsBLfOKcB9gtiJ1nYwqkptFjbT6ZbeaLLP3qrAs7n6HY4QS359bd0YC6jwrd1VcpqGnW79kX195lcH_go06CYLWW7bYcYtmMvKs6CcvT0AbAZU4h2EPd54qVvOQMEzWupbRNk4TVlVlp1vzbhBuOc.",
 );
 
 // 2차원 거리 계산
@@ -68,14 +73,6 @@ try {
 } catch (error) {
   console.log(`Failed to load tileset: ${error}`);
 }
-
-// At a location in San Francisco
-viewer.camera.setView({
-  destination: Cartesian3.fromDegrees(-122.38329, 37.74015, 16000),
-  orientation: {
-    pitch: CesiumMath.toRadians(-70.0),
-  },
-});
 
 async function getServiceArea(cartographic) {
   const coordinates = [
@@ -241,7 +238,7 @@ document.getElementById("travel-time").addEventListener("click", () => {
 
 // 두 좌표 간의 거리 계산
 var positions = [];
-document.getElementById("distance-btn").addEventListener("click", () => {
+document.getElementById("distance").addEventListener("click", () => {
   var handler = new ScreenSpaceEventHandler(viewer.canvas);
 
   // 거리 계산 기능 OFF
@@ -309,7 +306,7 @@ function displayDistances(spaceDistance, planeDistance, clickPosition) {
   modal.style.right = "20px";
   modal.style.transform = "translateY(-50%)";
   modal.style.width = "300px";
-  modal.style.height = "1000px";
+  modal.style.height = "500px";
   modal.style.padding = "20px";
   modal.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
   modal.style.border = "1px solid #ccc";
@@ -351,7 +348,7 @@ function displayDistances(spaceDistance, planeDistance, clickPosition) {
 }
 
 // Clear all polylines when the clear button is clicked
-document.getElementById("clear-btn").addEventListener("click", () => {
+document.getElementById("clear").addEventListener("click", () => {
   viewer.entities.removeAll();
   closeModal();
 });
@@ -363,3 +360,56 @@ function closeModal() {
     document.body.removeChild(modal);
   });
 }
+
+async function addBuildingJSON() {
+  // Load the GeoJSON file
+  const geoJSONURL = await IonResource.fromAssetId(2990559);
+  // Create the geometry from the GeoJSON, and clamp it to the ground
+  const geoJSON = await GeoJsonDataSource.load(geoJSONURL, {
+    clampToGround: true,
+  });
+  // Add it to the scene.
+  const dataSource = await viewer.dataSources.add(geoJSON);
+  for (const entity of dataSource.entities.values) {
+    // entity.polygon.classificationType = ClassificationType.TERRAIN;
+    entity.polygon.classificationType = new ConstantProperty(
+      ClassificationType.TERRAIN,
+    );
+  }
+  viewer.flyTo(dataSource);
+}
+
+let cachedBuildingTileset = null;
+// Toggle Buildings
+document
+  .getElementById("toggle-building")
+  .addEventListener("click", async () => {
+    viewer.camera.flyTo({
+      destination: Cartesian3.fromDegrees(-104.9965, 39.74248, 4000),
+    });
+
+    if (!cachedBuildingTileset) {
+      cachedBuildingTileset = await createOsmBuildingsAsync();
+      viewer.scene.primitives.add(cachedBuildingTileset);
+      addBuildingJSON();
+
+      cachedBuildingTileset.style = new Cesium3DTileStyle({
+        show: {
+          conditions: [
+            ["${elementId} === 332469316", false],
+            ["${elementId} === 332469317", false],
+            ["${elementId} === 235368665", false],
+            ["${elementId} === 530288180", false],
+            ["${elementId} === 530288179", false],
+            [true, true],
+          ],
+        },
+        color:
+          "Boolean(${feature['cesium#color']}) ? color(${feature['cesium#color']}) : color('#ffffff')",
+      });
+    }
+
+    const newBuildingTileset = await Cesium3DTileset.fromIonAssetId(2970538);
+    viewer.scene.primitives.add(newBuildingTileset);
+    viewer.flyTo(newBuildingTileset);
+  });

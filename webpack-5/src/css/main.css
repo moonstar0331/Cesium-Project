@@ -21,7 +21,7 @@ body,
   border-radius: 12px;
 }
 
-#distance-btn {
+#distance {
   z-index: 1;
   position: fixed;
   top: 5px;
@@ -45,7 +45,7 @@ body,
   background-color: gray;
 }
 
-#clear-btn {
+#clear {
   z-index: 1;
   position: fixed;
   top: 5px;
