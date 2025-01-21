@@ -4,14 +4,10 @@ import {
   Math as CesiumMath,
   ScreenSpaceEventHandler,
   ScreenSpaceEventType,
-  defined,
-  Color,
   Cartographic,
   VerticalOrigin,
   HeightReference,
   Cartesian2,
-  ConstantProperty,
-  ConstantPositionProperty,
   createOsmBuildingsAsync,
   Cesium3DTileStyle,
   Cesium3DTileset,
@@ -20,7 +16,7 @@ import {
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
 import { analysisDistance } from "./distance";
-import { getServiceArea } from "./serviceArea";
+import { AnalysisServiceArea } from "./serviceArea";
 import { updateDisplay } from "./elevation";
 
 // Math as CesiumMath
@@ -54,10 +50,22 @@ try {
   console.log(`Failed to load tileset: ${error}`);
 }
 
+// 마커 엔티티 생성
+const marker = viewer.entities.add({
+  name: "pickedPosition",
+  billboard: {
+    verticalOrigin: VerticalOrigin.BOTTOM,
+    heightReference: HeightReference.CLAMP_TO_GROUND,
+    image: "./marker.svg",
+    disableDepthTestDistance: Number.POSITIVE_INFINITY,
+    scale: 1,
+  },
+});
+
 // Travel Time 계산
 document.getElementById("travel-time").addEventListener("click", () => {
   // 여행 시간 구분 기능 OFF
-  viewer.screenSpaceEventHandler.setInputAction((click) => {
+  viewer.screenSpaceEventHandler.setInputAction(() => {
     viewer.dataSources.removeAll();
     viewer.scene.invertClassification = false;
     marker.show = false;
@@ -66,37 +74,8 @@ document.getElementById("travel-time").addEventListener("click", () => {
     );
   }, ScreenSpaceEventType.RIGHT_CLICK);
 
-  // 마커 엔티티 생성
-  const marker = viewer.entities.add({
-    name: "pickedPosition",
-    billboard: {
-      verticalOrigin: VerticalOrigin.BOTTOM,
-      heightReference: HeightReference.CLAMP_TO_GROUND,
-      image: "./marker.svg",
-      disableDepthTestDistance: Number.POSITIVE_INFINITY,
-      scale: 1,
-    },
-  });
-
-  // 마커 위치 및 여행 시간 분석 추가
-  viewer.screenSpaceEventHandler.setInputAction((movement) => {
-    viewer.dataSources.removeAll();
-    viewer.scene.invertClassification = false;
-    marker.show = false;
-
-    const pickedPosition = viewer.scene.pickPosition(movement.position);
-
-    if (!defined(pickedPosition)) {
-      return;
-    }
-
-    marker.position = new ConstantPositionProperty(pickedPosition);
-    marker.show = true;
-    viewer.scene.invertClassification = true;
-
-    const cartographic = Cartographic.fromCartesian(pickedPosition);
-    getServiceArea(viewer, cartographic);
-  }, ScreenSpaceEventType.LEFT_CLICK);
+  // 여행 시간 분석 기능 ON
+  AnalysisServiceArea(viewer, marker);
 });
 
 // 두 좌표 간의 거리 계산
@@ -110,6 +89,7 @@ document.getElementById("distance").addEventListener("click", () => {
     handler.destroy();
   }, ScreenSpaceEventType.RIGHT_CLICK);
 
+  // 거리 계산 기능 ON
   handler.setInputAction((click) => {
     analysisDistance(viewer, handler, positions, click);
   }, ScreenSpaceEventType.LEFT_CLICK);
@@ -130,7 +110,6 @@ function closeModal() {
 }
 
 // Toggle Buildings
-var isToggleBuilding = false;
 document
   .getElementById("toggle-building")
   .addEventListener("click", async () => {
@@ -162,7 +141,6 @@ const lng = document.getElementById("lng");
 box.addEventListener(
   "mousemove",
   function (event) {
-    const canvas = viewer.scene.canvas;
     const cartesian = viewer.camera.pickEllipsoid(
       new Cartesian2(event.clientX, event.clientY),
       viewer.scene.globe.ellipsoid,

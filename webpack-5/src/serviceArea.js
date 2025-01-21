@@ -7,6 +7,11 @@ import {
   GeoJsonDataSource,
   ConstantProperty,
   ColorMaterialProperty,
+  VerticalOrigin,
+  HeightReference,
+  ConstantPositionProperty,
+  Cartographic,
+  ScreenSpaceEventType,
 } from "cesium";
 
 // ArcGIS location services REST API KEY
@@ -14,7 +19,30 @@ const authentication = ApiKeyManager.fromKey(
   "AAPT3NKHt6i2urmWtqOuugvr9SZ2lQsIKWCKGUFYqC7k4zWYj4L7KghRPfM9GrAtIfKJIvtDkHEFmaegJXtSIw9oemOsBLfOKcB9gtiJ1nYwqkptFjbT6ZbeaLLP3qrAs7n6HY4QS359bd0YC6jwrd1VcpqGnW79kX195lcH_go06CYLWW7bYcYtmMvKs6CcvT0AbAZU4h2EPd54qVvOQMEzWupbRNk4TVlVlp1vzbhBuOc.",
 );
 
-export async function getServiceArea(viewer, cartographic) {
+export function AnalysisServiceArea(viewer, marker) {
+  // 마커 위치 및 여행 시간 분석 추가
+  viewer.screenSpaceEventHandler.setInputAction((movement) => {
+    viewer.dataSources.removeAll();
+    viewer.scene.invertClassification = false;
+    marker.show = false;
+
+    const pickedPosition = viewer.scene.pickPosition(movement.position);
+
+    if (!defined(pickedPosition)) {
+      return;
+    }
+
+    marker.position = new ConstantPositionProperty(pickedPosition);
+    marker.show = true;
+    viewer.scene.invertClassification = true;
+
+    const cartographic = Cartographic.fromCartesian(pickedPosition);
+    getServiceArea(viewer, cartographic);
+  }, ScreenSpaceEventType.LEFT_CLICK);
+}
+
+// Service Area 추출
+async function getServiceArea(viewer, cartographic) {
   const coordinates = [
     CesiumMath.toDegrees(cartographic.longitude),
     CesiumMath.toDegrees(cartographic.latitude),
