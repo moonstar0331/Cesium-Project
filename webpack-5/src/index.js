@@ -7,11 +7,13 @@ import {
   Cartographic,
   VerticalOrigin,
   HeightReference,
-  Cartesian2,
   createOsmBuildingsAsync,
+  Cartesian2,
   Cesium3DTileStyle,
   Cesium3DTileset,
   Terrain,
+  sampleTerrainMostDetailed,
+  createWorldTerrainAsync,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
@@ -136,6 +138,7 @@ document
 const box = document.getElementById("cesiumContainer");
 const lat = document.getElementById("lat");
 const lng = document.getElementById("lng");
+const elev = document.getElementById("elev");
 
 // 화면 우측 하단 위경도 표시
 box.addEventListener(
@@ -149,8 +152,16 @@ box.addEventListener(
       const cartographic = Cartographic.fromCartesian(cartesian);
       const longitude = CesiumMath.toDegrees(cartographic.longitude).toFixed(4);
       const latitude = CesiumMath.toDegrees(cartographic.latitude).toFixed(4);
+
+      const altitude = viewer.scene.globe
+        .getHeight(
+          Cartographic.fromDegrees(parseFloat(longitude), parseFloat(latitude)),
+        )
+        .toFixed(2);
+
       lat.innerHTML = latitude;
       lng.innerHTML = longitude;
+      elev.innerHTML = altitude;
     }
   },
   false,
@@ -176,20 +187,3 @@ document.getElementById("elevation").addEventListener("click", () => {
     isElevation = false;
   }, ScreenSpaceEventType.RIGHT_CLICK);
 });
-
-// 화면 우측 하단 고도 표시
-box.addEventListener(
-  "mousemove",
-  function (event) {
-    const cartesian = viewer.camera.pickEllipsoid(
-      new Cartesian2(event.clientX, event.clientY),
-      viewer.scene.globe.ellipsoid,
-    );
-    if (cartesian) {
-      const cartographic = Cartographic.fromCartesian(cartesian);
-      const altitude = cartographic.height.toFixed(2);
-      document.getElementById("elev").innerHTML = altitude;
-    }
-  },
-  false,
-);
