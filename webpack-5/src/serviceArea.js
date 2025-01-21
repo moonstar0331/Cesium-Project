@@ -7,8 +7,6 @@ import {
   GeoJsonDataSource,
   ConstantProperty,
   ColorMaterialProperty,
-  VerticalOrigin,
-  HeightReference,
   ConstantPositionProperty,
   Cartographic,
   ScreenSpaceEventType,

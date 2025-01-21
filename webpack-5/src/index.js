@@ -158,21 +158,21 @@ box.addEventListener(
 
 // Elevation 버튼 이벤트 이벤트
 var isElevation = false;
+const updateDisplayHandler = (event) => updateDisplay(viewer, event);
+
 document.getElementById("elevation").addEventListener("click", () => {
   if (isElevation) {
-    box.removeEventListener(
-      "mousemove",
-      (event) => updateDisplay(viewer, event),
-      false,
-    );
+    box.removeEventListener("mousemove", updateDisplayHandler, false);
     viewer.entities.removeById("coordinate");
     isElevation = false;
   } else {
-    box.addEventListener(
-      "mousemove",
-      (event) => updateDisplay(viewer, event),
-      false,
-    );
+    box.addEventListener("mousemove", updateDisplayHandler, false);
     isElevation = true;
   }
+
+  viewer.screenSpaceEventHandler.setInputAction(() => {
+    box.removeEventListener("mousemove", updateDisplayHandler, false);
+    viewer.entities.removeById("coordinate");
+    isElevation = false;
+  }, ScreenSpaceEventType.RIGHT_CLICK);
 });

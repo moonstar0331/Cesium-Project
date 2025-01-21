@@ -23,13 +23,13 @@ export function updateDisplay(viewer, event) {
 
     if (defined(coord) && viewer.entities.contains(coord)) {
       coord.position = new ConstantPositionProperty(cartesian);
-      coord.label.text = new ConstantProperty(`${latitude}, ${longitude}`);
+      coord.label.text = new ConstantProperty(`${longitude} ${latitude}`);
     } else {
       viewer.entities.add({
         id: "coordinate",
         position: cartesian,
         label: {
-          text: `${latitude}, ${longitude}`,
+          text: `${longitude} ${latitude}`,
           font: "20px sans-serif",
           fillColor: Color.RED,
           outlineColor: Color.BLACK,
