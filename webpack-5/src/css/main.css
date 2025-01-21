@@ -44,10 +44,15 @@ body {
 #coordinates {
   display: inline-block;
   padding: 15px 32px;
-  color: white;
+  /* color: white; */
+  color: #07c752;
   float: right;
   margin-right: 5px;
   font-family: Arial, sans-serif;
   font-size: 14px;
   margin: auto;
+}
+
+#coordinates span {
+  color: white;
 }

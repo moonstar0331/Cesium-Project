@@ -400,6 +400,40 @@ const box = document.getElementById("cesiumContainer");
 const lat = document.getElementById("lat");
 const lng = document.getElementById("lng");
 
+// 화면 우측 하단 위경도 표시
+box.addEventListener(
+  "mousemove",
+  function (event) {
+    const canvas = viewer.scene.canvas;
+    const cartesian = viewer.camera.pickEllipsoid(
+      new Cartesian2(event.clientX, event.clientY),
+      viewer.scene.globe.ellipsoid,
+    );
+    if (cartesian) {
+      const cartographic = Cartographic.fromCartesian(cartesian);
+      const longitude = CesiumMath.toDegrees(cartographic.longitude).toFixed(4);
+      const latitude = CesiumMath.toDegrees(cartographic.latitude).toFixed(4);
+      lat.innerHTML = latitude;
+      lng.innerHTML = longitude;
+    }
+  },
+  false,
+);
+
+// Elevation 버튼 이벤트 이벤트
+var isElevation = false;
+document.getElementById("elevation").addEventListener("click", () => {
+  if (isElevation) {
+    box.removeEventListener("mousemove", updateDisplay, false);
+    viewer.entities.removeById("coordinate");
+    isElevation = false;
+  } else {
+    box.addEventListener("mousemove", updateDisplay, false);
+    isElevation = true;
+  }
+});
+
+// Elavation Coordinate Label Display Function
 function updateDisplay(event) {
   const canvas = viewer.scene.canvas;
   const cartesian = viewer.camera.pickEllipsoid(
@@ -432,5 +466,3 @@ function updateDisplay(event) {
     });
   }
 }
-
-box.addEventListener("mousemove", updateDisplay, false);
