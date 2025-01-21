@@ -1,5 +1,4 @@
 import {
-  Cartesian3,
   Ion,
   Viewer,
   Math as CesiumMath,
@@ -7,18 +6,12 @@ import {
   ScreenSpaceEventType,
   defined,
   Color,
-  createGooglePhotorealistic3DTileset,
-  GeoJsonDataSource,
   Cartographic,
   VerticalOrigin,
   HeightReference,
   Cartesian2,
-  IonGeocodeProviderType,
   ConstantProperty,
-  ColorMaterialProperty,
   ConstantPositionProperty,
-  IonResource,
-  ClassificationType,
   createOsmBuildingsAsync,
   Cesium3DTileStyle,
   Cesium3DTileset,
@@ -26,9 +19,9 @@ import {
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
-import { ApiKeyManager } from "@esri/arcgis-rest-request";
-import { serviceArea } from "@esri/arcgis-rest-routing";
 import { analysisDistance } from "./distance";
+import { getServiceArea } from "./serviceArea";
+import { updateDisplay } from "./elevation";
 
 // Math as CesiumMath
 
@@ -36,11 +29,6 @@ import { analysisDistance } from "./distance";
 // please set your own access token can be found at: https://cesium.com/ion/tokens.
 Ion.defaultAccessToken =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhNzQ0OWUzMS1lMTdiLTQ4ZWYtOTYwMi1kYjZkNjE4MjE2MzQiLCJpZCI6MjY3MDE5LCJpYXQiOjE3MzYxNDg2ODR9.FZHYOYD25Snz3ZYimh5wNaATYbXHoB6p79gshGItaek";
-
-// ArcGIS location services REST API
-const authentication = ApiKeyManager.fromKey(
-  "AAPT3NKHt6i2urmWtqOuugvr9SZ2lQsIKWCKGUFYqC7k4zWYj4L7KghRPfM9GrAtIfKJIvtDkHEFmaegJXtSIw9oemOsBLfOKcB9gtiJ1nYwqkptFjbT6ZbeaLLP3qrAs7n6HY4QS359bd0YC6jwrd1VcpqGnW79kX195lcH_go06CYLWW7bYcYtmMvKs6CcvT0AbAZU4h2EPd54qVvOQMEzWupbRNk4TVlVlp1vzbhBuOc.",
-);
 
 // const viewer = new Viewer("cesiumContainer", {
 //   timeline: true,
@@ -66,123 +54,6 @@ try {
   console.log(`Failed to load tileset: ${error}`);
 }
 
-async function getServiceArea(cartographic) {
-  const coordinates = [
-    CesiumMath.toDegrees(cartographic.longitude),
-    CesiumMath.toDegrees(cartographic.latitude),
-  ];
-
-  let geojson;
-  try {
-    const response = await serviceArea({
-      // @ts-ignore
-      facilities: [coordinates],
-      authentication,
-    });
-
-    geojson = response.saPolygons.geoJson;
-  } catch (error) {
-    console.log(`Failed to load service area: ${error}`);
-  }
-
-  if (!defined(geojson)) {
-    return;
-  }
-
-  let dataSource;
-  try {
-    dataSource = await GeoJsonDataSource.load(geojson, {
-      clampToGround: true,
-    });
-    viewer.dataSources.add(dataSource);
-  } catch (error) {
-    console.log(`Failed to load geojson: ${error}`);
-  }
-
-  if (!defined(dataSource)) {
-    return;
-  }
-
-  // Style the results
-  const entities = dataSource.entities.values;
-  const serviceAreaInfo = {
-    "0-5 minutes": { count: 0, color: "rgba(149, 223, 255, 0.5)" },
-    "5-10 minutes": { count: 0, color: "rgba(102, 204, 255, 0.5)" },
-    "10+ minutes": { count: 0, color: "rgba(51, 153, 255, 0.5)" },
-  };
-
-  for (let i = 0; i < entities.length; i++) {
-    const feature = entities[i];
-    feature.polygon.outline = new ConstantProperty(false);
-
-    let color, description;
-    if (feature.properties.FromBreak === 0) {
-      color = Color.fromHsl(0.5833, 0.8, 0.9, 0.5);
-      description = "0-5 minutes";
-    } else if (feature.properties.FromBreak === 5) {
-      color = Color.fromHsl(0.5833, 0.9, 0.7, 0.5);
-      description = "5-10 minutes";
-    } else {
-      color = Color.fromHsl(0.5833, 1.0, 0.4, 0.5);
-      description = "10+ minutes";
-    }
-    feature.polygon.material = new ColorMaterialProperty(color);
-    serviceAreaInfo[description].count++;
-  }
-
-  const scene = viewer.scene;
-  scene.invertClassification = true;
-  scene.invertClassificationColor = new Color(0.4, 0.4, 0.4, 1.0);
-
-  displayServiceAreaInfo(serviceAreaInfo);
-}
-
-function displayServiceAreaInfo(serviceAreaInfo) {
-  const modal = document.createElement("div");
-  modal.className = "service-area-modal";
-  modal.style.position = "fixed";
-  modal.style.top = "50%";
-  modal.style.right = "20px";
-  modal.style.transform = "translateY(-50%)";
-  modal.style.width = "300px";
-  modal.style.padding = "20px";
-  modal.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
-  modal.style.border = "1px solid #ccc";
-  modal.style.borderRadius = "8px";
-  modal.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
-  modal.style.zIndex = "1000";
-  modal.style.fontFamily = "Arial, sans-serif";
-
-  const title = document.createElement("h3");
-  title.textContent = "Service Area Information";
-  title.style.marginTop = "0";
-  modal.appendChild(title);
-
-  for (const [description, info] of Object.entries(serviceAreaInfo)) {
-    const infoText = document.createElement("p");
-    infoText.innerHTML = `<span style="background-color: ${info.color}; padding: 2px 5px; border-radius: 3px;">&nbsp;&nbsp;&nbsp;&nbsp;</span> ${description}: ${info.count} areas`;
-    modal.appendChild(infoText);
-  }
-
-  const closeButton = document.createElement("button");
-  closeButton.textContent = "Close";
-  closeButton.style.position = "absolute";
-  closeButton.style.top = "10px";
-  closeButton.style.right = "10px";
-  closeButton.style.padding = "5px 10px";
-  closeButton.style.border = "none";
-  closeButton.style.borderRadius = "4px";
-  closeButton.style.backgroundColor = "#007bff";
-  closeButton.style.color = "white";
-  closeButton.style.cursor = "pointer";
-  closeButton.onclick = () => {
-    document.body.removeChild(modal);
-  };
-  modal.appendChild(closeButton);
-
-  document.body.appendChild(modal);
-}
-
 // Travel Time 계산
 document.getElementById("travel-time").addEventListener("click", () => {
   // 여행 시간 구분 기능 OFF
@@ -190,7 +61,6 @@ document.getElementById("travel-time").addEventListener("click", () => {
     viewer.dataSources.removeAll();
     viewer.scene.invertClassification = false;
     marker.show = false;
-    // viewer.screenSpaceEventHandler.destroy();
     viewer.screenSpaceEventHandler.removeInputAction(
       ScreenSpaceEventType.LEFT_CLICK,
     );
@@ -225,7 +95,7 @@ document.getElementById("travel-time").addEventListener("click", () => {
     viewer.scene.invertClassification = true;
 
     const cartographic = Cartographic.fromCartesian(pickedPosition);
-    getServiceArea(cartographic);
+    getServiceArea(viewer, cartographic);
   }, ScreenSpaceEventType.LEFT_CLICK);
 });
 
@@ -312,44 +182,19 @@ box.addEventListener(
 var isElevation = false;
 document.getElementById("elevation").addEventListener("click", () => {
   if (isElevation) {
-    box.removeEventListener("mousemove", updateDisplay, false);
+    box.removeEventListener(
+      "mousemove",
+      (event) => updateDisplay(viewer, event),
+      false,
+    );
     viewer.entities.removeById("coordinate");
     isElevation = false;
   } else {
-    box.addEventListener("mousemove", updateDisplay, false);
+    box.addEventListener(
+      "mousemove",
+      (event) => updateDisplay(viewer, event),
+      false,
+    );
     isElevation = true;
   }
 });
-
-// Elavation Coordinate Label Display Function
-function updateDisplay(event) {
-  const cartesian = viewer.camera.pickEllipsoid(
-    new Cartesian2(event.clientX, event.clientY),
-    viewer.scene.globe.ellipsoid,
-  );
-  if (cartesian) {
-    const cartographic = Cartographic.fromCartesian(cartesian);
-    const longitude = CesiumMath.toDegrees(cartographic.longitude).toFixed(4);
-    const latitude = CesiumMath.toDegrees(cartographic.latitude).toFixed(4);
-
-    const coord = viewer.entities.getById("coordinate");
-
-    if (defined(coord) && viewer.entities.contains(coord)) {
-      coord.position = new ConstantPositionProperty(cartesian);
-      coord.label.text = new ConstantProperty(`${latitude}, ${longitude}`);
-    } else {
-      viewer.entities.add({
-        id: "coordinate",
-        position: cartesian,
-        label: {
-          text: `${latitude}, ${longitude}`,
-          font: "20px sans-serif",
-          fillColor: Color.RED,
-          outlineColor: Color.BLACK,
-          showBackground: true,
-          pixelOffset: new Cartesian2(0, -20),
-        },
-      });
-    }
-  }
-}
