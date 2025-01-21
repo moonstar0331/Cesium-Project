@@ -176,3 +176,20 @@ document.getElementById("elevation").addEventListener("click", () => {
     isElevation = false;
   }, ScreenSpaceEventType.RIGHT_CLICK);
 });
+
+// 화면 우측 하단 고도 표시
+box.addEventListener(
+  "mousemove",
+  function (event) {
+    const cartesian = viewer.camera.pickEllipsoid(
+      new Cartesian2(event.clientX, event.clientY),
+      viewer.scene.globe.ellipsoid,
+    );
+    if (cartesian) {
+      const cartographic = Cartographic.fromCartesian(cartesian);
+      const altitude = cartographic.height.toFixed(2);
+      document.getElementById("elev").innerHTML = altitude;
+    }
+  },
+  false,
+);

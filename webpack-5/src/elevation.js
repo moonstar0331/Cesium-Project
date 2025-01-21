@@ -18,19 +18,22 @@ export function updateDisplay(viewer, event) {
     const cartographic = Cartographic.fromCartesian(cartesian);
     const longitude = CesiumMath.toDegrees(cartographic.longitude).toFixed(4);
     const latitude = CesiumMath.toDegrees(cartographic.latitude).toFixed(4);
+    const height = cartographic.height.toFixed(2);
 
     const coord = viewer.entities.getById("coordinate");
 
     if (defined(coord) && viewer.entities.contains(coord)) {
       coord.position = new ConstantPositionProperty(cartesian);
-      coord.label.text = new ConstantProperty(`${longitude} ${latitude}`);
+      coord.label.text = new ConstantProperty(
+        `${longitude} ${latitude} ${height}`,
+      );
     } else {
       viewer.entities.add({
         id: "coordinate",
         position: cartesian,
         label: {
-          text: `${longitude} ${latitude}`,
-          font: "20px sans-serif",
+          text: `${longitude} ${latitude} ${height}`,
+          font: "14px sans-serif",
           fillColor: Color.RED,
           outlineColor: Color.BLACK,
           showBackground: true,
