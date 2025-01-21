@@ -22,6 +22,7 @@ import {
   createOsmBuildingsAsync,
   Cesium3DTileStyle,
   Cesium3DTileset,
+  Terrain,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
@@ -44,32 +45,39 @@ const authentication = ApiKeyManager.fromKey(
 function calculatePlaneDistance(position1, position2) {
   const dx = position2.x - position1.x;
   const dy = position2.y - position1.y;
-  var planeDistance = (Math.sqrt(dx * dx + dy * dy) / 1000).toFixed(3);
+  const planeDistance = (Math.sqrt(dx * dx + dy * dy) / 1000).toFixed(3);
 
   return planeDistance;
 }
 
 // 3차원 거리 계산
 function calculateSpaceDistance(position1, position2) {
-  var spaceDistance = (
+  const spaceDistance = (
     Cartesian3.distance(position1, position2) / 1000
   ).toFixed(3);
 
   return spaceDistance;
 }
 
+// const viewer = new Viewer("cesiumContainer", {
+//   timeline: true,
+//   animation: true,
+//   geocoder: IonGeocodeProviderType.GOOGLE,
+//   globe: false,
+// });
+
 const viewer = new Viewer("cesiumContainer", {
-  timeline: true,
-  animation: true,
-  geocoder: IonGeocodeProviderType.GOOGLE,
-  globe: false,
+  terrain: Terrain.fromWorldTerrain(),
 });
 
 // Add a global base layer using the Google Maps Platform Map Tiles API
+var buildingsTileset;
 try {
   // @ts-ignore
-  const tileset = await createGooglePhotorealistic3DTileset();
-  viewer.scene.primitives.add(tileset);
+  // const tileset = await createGooglePhotorealistic3DTileset();
+  // viewer.scene.primitives.add(tileset);
+  buildingsTileset = await createOsmBuildingsAsync();
+  viewer.scene.primitives.add(buildingsTileset);
 } catch (error) {
   console.log(`Failed to load tileset: ${error}`);
 }
@@ -83,6 +91,7 @@ async function getServiceArea(cartographic) {
   let geojson;
   try {
     const response = await serviceArea({
+      // @ts-ignore
       facilities: [coordinates],
       authentication,
     });
@@ -112,7 +121,7 @@ async function getServiceArea(cartographic) {
 
   // Style the results
   const entities = dataSource.entities.values;
-  let serviceAreaInfo = {
+  const serviceAreaInfo = {
     "0-5 minutes": { count: 0, color: "rgba(149, 223, 255, 0.5)" },
     "5-10 minutes": { count: 0, color: "rgba(102, 204, 255, 0.5)" },
     "10+ minutes": { count: 0, color: "rgba(51, 153, 255, 0.5)" },
@@ -123,10 +132,10 @@ async function getServiceArea(cartographic) {
     feature.polygon.outline = new ConstantProperty(false);
 
     let color, description;
-    if (feature.properties.FromBreak == 0) {
+    if (feature.properties.FromBreak === 0) {
       color = Color.fromHsl(0.5833, 0.8, 0.9, 0.5);
       description = "0-5 minutes";
-    } else if (feature.properties.FromBreak == 5) {
+    } else if (feature.properties.FromBreak === 5) {
       color = Color.fromHsl(0.5833, 0.9, 0.7, 0.5);
       description = "5-10 minutes";
     } else {
@@ -237,7 +246,7 @@ document.getElementById("travel-time").addEventListener("click", () => {
 });
 
 // 두 좌표 간의 거리 계산
-var positions = [];
+let positions = [];
 document.getElementById("distance").addEventListener("click", () => {
   var handler = new ScreenSpaceEventHandler(viewer.canvas);
 
@@ -248,7 +257,7 @@ document.getElementById("distance").addEventListener("click", () => {
   }, ScreenSpaceEventType.RIGHT_CLICK);
 
   handler.setInputAction(function (click) {
-    var pickedPosition = viewer.scene.pickPosition(click.position);
+    let pickedPosition = viewer.scene.pickPosition(click.position);
 
     // 클릭한 좌표가 유효한지 확인
     if (defined(pickedPosition)) {
@@ -361,55 +370,38 @@ function closeModal() {
   });
 }
 
-async function addBuildingJSON() {
-  // Load the GeoJSON file
-  const geoJSONURL = await IonResource.fromAssetId(2990559);
-  // Create the geometry from the GeoJSON, and clamp it to the ground
-  const geoJSON = await GeoJsonDataSource.load(geoJSONURL, {
-    clampToGround: true,
-  });
-  // Add it to the scene.
-  const dataSource = await viewer.dataSources.add(geoJSON);
-  for (const entity of dataSource.entities.values) {
-    // entity.polygon.classificationType = ClassificationType.TERRAIN;
-    entity.polygon.classificationType = new ConstantProperty(
-      ClassificationType.TERRAIN,
-    );
-  }
-  viewer.flyTo(dataSource);
-}
-
-let cachedBuildingTileset = null;
 // Toggle Buildings
+var isToggleBuilding = false;
 document
   .getElementById("toggle-building")
   .addEventListener("click", async () => {
-    viewer.camera.flyTo({
-      destination: Cartesian3.fromDegrees(-104.9965, 39.74248, 4000),
+    buildingsTileset.style = new Cesium3DTileStyle({
+      show: {
+        conditions: [
+          ["${elementId} === 332469316", false],
+          ["${elementId} === 332469317", false],
+          ["${elementId} === 235368665", false],
+          ["${elementId} === 530288180", false],
+          ["${elementId} === 530288179", false],
+          [true, true],
+        ],
+      },
+      color:
+        "Boolean(${feature['cesium#color']}) ? color(${feature['cesium#color']}) : color('#ffffff')",
     });
-
-    if (!cachedBuildingTileset) {
-      cachedBuildingTileset = await createOsmBuildingsAsync();
-      viewer.scene.primitives.add(cachedBuildingTileset);
-      addBuildingJSON();
-
-      cachedBuildingTileset.style = new Cesium3DTileStyle({
-        show: {
-          conditions: [
-            ["${elementId} === 332469316", false],
-            ["${elementId} === 332469317", false],
-            ["${elementId} === 235368665", false],
-            ["${elementId} === 530288180", false],
-            ["${elementId} === 530288179", false],
-            [true, true],
-          ],
-        },
-        color:
-          "Boolean(${feature['cesium#color']}) ? color(${feature['cesium#color']}) : color('#ffffff')",
-      });
-    }
 
     const newBuildingTileset = await Cesium3DTileset.fromIonAssetId(2970538);
     viewer.scene.primitives.add(newBuildingTileset);
     viewer.flyTo(newBuildingTileset);
   });
+
+const box = document.getElementById("cesiumContainer");
+const x = document.getElementById("x");
+const y = document.getElementById("y");
+
+function updateDisplay(event) {
+  x.innerHTML = event.x;
+  y.innerHTML = event.y;
+}
+
+box.addEventListener("mousemove", updateDisplay, false);
