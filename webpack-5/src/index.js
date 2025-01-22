@@ -15,7 +15,7 @@ import {
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
-import { analysisDistance } from "./distance";
+import { analysisDistance, analysisTerrainProfile } from "./distance";
 import { AnalysisServiceArea } from "./serviceArea";
 import { updateDisplay } from "./elevation";
 import { addEventListenerById, displayTerrainAnalysisModal } from "./modal";
@@ -59,11 +59,28 @@ document.getElementById("terrain").addEventListener("click", () => {
       analysisDistance(viewer, handler, positions, click);
     }, ScreenSpaceEventType.LEFT_CLICK);
   });
+
+  addEventListenerById("terrain-profile", "click", () => {
+    let positions = [];
+
+    var handler = new ScreenSpaceEventHandler(viewer.canvas);
+
+    // 거리 계산 기능 OFF
+    handler.setInputAction(function (click) {
+      positions = [];
+      handler.destroy();
+    }, ScreenSpaceEventType.RIGHT_CLICK);
+
+    // 거리 계산 기능 ON
+    handler.setInputAction((click) => {
+      analysisTerrainProfile(viewer, handler, positions, click);
+    }, ScreenSpaceEventType.LEFT_CLICK);
+  });
 });
 
 // 모달 창 닫기 함수
 function closeModal() {
-  const modals = document.querySelectorAll(".distance-modal");
+  const modals = document.querySelectorAll(".modal");
   modals.forEach((modal) => {
     document.body.removeChild(modal);
   });

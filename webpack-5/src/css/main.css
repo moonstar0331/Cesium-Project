@@ -84,7 +84,7 @@ body {
   cursor: pointer;
 }
 
-.distance-modal {
+.result-modal {
   position: fixed;
   top: 50%;
   right: 20px;

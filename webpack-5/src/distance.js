@@ -31,8 +31,6 @@ export function analysisDistance(viewer, handler, positions, click) {
   if (defined(pickedPosition)) {
     positions.push(pickedPosition);
 
-    console.log(positions);
-
     // 두 번째 좌표가 선택되었을 때 Polyline 생성
     if (positions.length === 2) {
       var spaceDistance = calculateSpaceDistance(positions[0], positions[1]);
@@ -43,7 +41,7 @@ export function analysisDistance(viewer, handler, positions, click) {
         polyline: {
           positions: positions,
           material: Color.RED,
-          width: 5,
+          width: 3,
           clampToGround: false,
           zIndex: Number.POSITIVE_INFINITY,
         },
@@ -78,7 +76,7 @@ export function analysisDistance(viewer, handler, positions, click) {
 // Create a modal to display distances
 function displayDistances(spaceDistance, planeDistance) {
   const modal = document.createElement("div");
-  modal.className = "distance-modal";
+  modal.className = "result-modal modal";
 
   const title = document.createElement("div");
   title.className = "modal-title";
@@ -108,6 +106,62 @@ function displayDistances(spaceDistance, planeDistance) {
   planeDistanceText.textContent = `Plane Distance: ${planeDistance} km`;
   content.appendChild(planeDistanceText);
 
+  modal.appendChild(content);
+
+  document.body.appendChild(modal);
+}
+
+export function analysisTerrainProfile(viewer, handler, positions, click) {
+  let pickedPosition = viewer.scene.pickPosition(click.position);
+
+  // 클릭한 좌표가 유효한지 확인
+  if (defined(pickedPosition)) {
+    positions.push(pickedPosition);
+
+    // 두 번째 좌표가 선택되었을 때 Polyline 생성
+    if (positions.length === 2) {
+      // polyline 생성
+      viewer.entities.add({
+        polyline: {
+          positions: positions,
+          material: Color.RED,
+          width: 4,
+          clampToGround: false,
+          zIndex: Number.POSITIVE_INFINITY,
+        },
+      });
+
+      displayTerrainProfileResult();
+
+      // 위치 초기화
+      positions = [];
+      handler.destroy();
+    }
+  }
+}
+
+function displayTerrainProfileResult() {
+  const modal = document.createElement("div");
+  modal.className = "result-modal modal";
+
+  const title = document.createElement("div");
+  title.className = "modal-title";
+
+  const titleText = document.createElement("h3");
+  titleText.textContent = "Terrain Profile Analysis";
+  title.appendChild(titleText);
+
+  const closeButton = document.createElement("button");
+  closeButton.textContent = "X";
+  closeButton.className = "close-btn";
+  closeButton.onclick = () => {
+    document.body.removeChild(modal);
+  };
+  title.appendChild(closeButton);
+  modal.appendChild(title);
+
+  const content = document.createElement("div");
+  content.className = "modal-content";
   modal.appendChild(content);
 
   document.body.appendChild(modal);
