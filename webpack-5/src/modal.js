@@ -35,6 +35,12 @@ export function displayTerrainAnalysisModal() {
   analysisTerrainProfileButton.id = "terrain-profile";
   content.appendChild(analysisTerrainProfileButton);
 
+  const analysisSlopeButton = document.createElement("button");
+  analysisSlopeButton.textContent = "Slope Analysis";
+  analysisSlopeButton.className = "analysis-btn";
+  analysisSlopeButton.id = "slope";
+  content.appendChild(analysisSlopeButton);
+
   modal.appendChild(content);
   document.body.appendChild(modal);
 }

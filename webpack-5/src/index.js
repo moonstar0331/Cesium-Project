@@ -12,6 +12,8 @@ import {
   Cesium3DTileStyle,
   Cesium3DTileset,
   Terrain,
+  Color,
+  defined,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
@@ -75,6 +77,52 @@ document.getElementById("terrain").addEventListener("click", () => {
     handler.setInputAction((click) => {
       analysisTerrainProfile(viewer, handler, positions, click);
     }, ScreenSpaceEventType.LEFT_CLICK);
+  });
+
+  addEventListenerById("slope", "click", async () => {
+    const geocoder = viewer.geocoder.viewModel;
+    geocoder.searchText = "Vienna";
+    geocoder.flightDuration = 0.0;
+    // @ts-ignore
+    geocoder.search();
+
+    try {
+      const tileset = await Cesium3DTileset.fromIonAssetId(5737);
+      viewer.scene.primitives.add(tileset);
+
+      tileset.style = new Cesium3DTileStyle({
+        color: "rgba(255, 255, 255, 0.5)",
+      });
+    } catch (error) {
+      console.log(`Error loading tileset: ${error}`);
+    }
+
+    const highlighted = {
+      feature: undefined,
+      originalColor: new Color(),
+    };
+
+    // Color a feature yellow on hover.
+    viewer.screenSpaceEventHandler.setInputAction(function onMouseMove(
+      movement,
+    ) {
+      // If a feature was previously highlighted, undo the highlight
+      if (defined(highlighted.feature)) {
+        highlighted.feature.color = highlighted.originalColor;
+        highlighted.feature = undefined;
+      }
+
+      // Pick a new feature
+      const pickedFeature = viewer.scene.pick(movement.endPosition);
+      if (!defined(pickedFeature)) {
+        return;
+      }
+
+      // Highlight the feature
+      highlighted.feature = pickedFeature;
+      Color.clone(pickedFeature.color, highlighted.originalColor);
+      pickedFeature.color = Color.YELLOW;
+    }, ScreenSpaceEventType.MOUSE_MOVE);
   });
 });
 
@@ -195,10 +243,11 @@ box.addEventListener(
       const longitude = CesiumMath.toDegrees(cartographic.longitude).toFixed(4);
       const latitude = CesiumMath.toDegrees(cartographic.latitude).toFixed(4);
 
-      const height = viewer.scene.globe.getHeight(
-        Cartographic.fromDegrees(parseFloat(longitude), parseFloat(latitude)),
-      );
-      const altitude = height !== undefined ? height.toFixed(2) : "0";
+      const altitude = viewer.scene.globe
+        ?.getHeight(
+          Cartographic.fromDegrees(parseFloat(longitude), parseFloat(latitude)),
+        )
+        ?.toFixed(2);
 
       lat.innerHTML = latitude;
       lng.innerHTML = longitude;
