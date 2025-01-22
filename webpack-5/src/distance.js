@@ -120,6 +120,8 @@ export function analysisTerrainProfile(viewer, handler, positions, click) {
 
     // 두 번째 좌표가 선택되었을 때 Polyline 생성
     if (positions.length === 2) {
+      var planeDistance = calculatePlaneDistance(positions[0], positions[1]);
+
       // polyline 생성
       viewer.entities.add({
         polyline: {
@@ -131,7 +133,7 @@ export function analysisTerrainProfile(viewer, handler, positions, click) {
         },
       });
 
-      displayTerrainProfileResult();
+      displayTerrainProfileResult(planeDistance);
 
       // 위치 초기화
       positions = [];
@@ -140,7 +142,7 @@ export function analysisTerrainProfile(viewer, handler, positions, click) {
   }
 }
 
-function displayTerrainProfileResult() {
+function displayTerrainProfileResult(planeDistance) {
   const modal = document.createElement("div");
   modal.className = "result-modal modal";
 
@@ -162,6 +164,11 @@ function displayTerrainProfileResult() {
 
   const content = document.createElement("div");
   content.className = "modal-content";
+
+  const spaceDistanceText = document.createElement("p");
+  spaceDistanceText.textContent = `Section length : ${planeDistance} km`;
+  content.appendChild(spaceDistanceText);
+
   modal.appendChild(content);
 
   document.body.appendChild(modal);

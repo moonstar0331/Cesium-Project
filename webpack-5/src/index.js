@@ -195,11 +195,10 @@ box.addEventListener(
       const longitude = CesiumMath.toDegrees(cartographic.longitude).toFixed(4);
       const latitude = CesiumMath.toDegrees(cartographic.latitude).toFixed(4);
 
-      const altitude = viewer.scene.globe
-        .getHeight(
-          Cartographic.fromDegrees(parseFloat(longitude), parseFloat(latitude)),
-        )
-        .toFixed(2);
+      const height = viewer.scene.globe.getHeight(
+        Cartographic.fromDegrees(parseFloat(longitude), parseFloat(latitude)),
+      );
+      const altitude = height !== undefined ? height.toFixed(2) : "0";
 
       lat.innerHTML = latitude;
       lng.innerHTML = longitude;
