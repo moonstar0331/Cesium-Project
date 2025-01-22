@@ -66,7 +66,7 @@ export function analysisDistance(viewer, handler, positions, click) {
         },
       });
 
-      displayDistances(spaceDistance, planeDistance, click.position);
+      displayDistances(spaceDistance, planeDistance);
 
       // 위치 초기화
       positions = [];
@@ -76,7 +76,7 @@ export function analysisDistance(viewer, handler, positions, click) {
 }
 
 // Create a modal to display distances
-function displayDistances(spaceDistance, planeDistance, clickPosition) {
+function displayDistances(spaceDistance, planeDistance) {
   const modal = document.createElement("div");
   modal.className = "distance-modal";
 
@@ -88,7 +88,7 @@ function displayDistances(spaceDistance, planeDistance, clickPosition) {
   title.appendChild(titleText);
 
   const closeButton = document.createElement("button");
-  closeButton.textContent = "Close";
+  closeButton.textContent = "X";
   closeButton.className = "close-btn";
   closeButton.onclick = () => {
     document.body.removeChild(modal);
@@ -99,7 +99,6 @@ function displayDistances(spaceDistance, planeDistance, clickPosition) {
 
   const content = document.createElement("div");
   content.className = "modal-content";
-  content.style.paddingTop = "10px";
 
   const spaceDistanceText = document.createElement("p");
   spaceDistanceText.textContent = `Space Distance: ${spaceDistance} km`;
