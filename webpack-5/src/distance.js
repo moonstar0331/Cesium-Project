@@ -81,48 +81,37 @@ export function analysisDistance(viewer, handler, positions, click) {
 function displayDistances(spaceDistance, planeDistance, clickPosition) {
   const modal = document.createElement("div");
   modal.className = "distance-modal";
-  modal.style.position = "fixed";
-  modal.style.top = "50%";
-  modal.style.right = "20px";
-  modal.style.transform = "translateY(-50%)";
-  modal.style.width = "300px";
-  modal.style.height = "500px";
-  modal.style.padding = "20px";
-  modal.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
-  modal.style.border = "1px solid #ccc";
-  modal.style.borderRadius = "8px";
-  modal.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
-  modal.style.zIndex = "1000";
-  modal.style.fontFamily = "Arial, sans-serif";
 
-  const title = document.createElement("h3");
-  title.textContent = "Distance Information";
-  title.style.marginTop = "0";
-  modal.appendChild(title);
+  const title = document.createElement("div");
+  title.className = "modal-title";
 
-  const spaceDistanceText = document.createElement("p");
-  spaceDistanceText.textContent = `Space Distance: ${spaceDistance} km`;
-  modal.appendChild(spaceDistanceText);
-
-  const planeDistanceText = document.createElement("p");
-  planeDistanceText.textContent = `Plane Distance: ${planeDistance} km`;
-  modal.appendChild(planeDistanceText);
+  const titleText = document.createElement("h3");
+  titleText.textContent = "Distance Information";
+  title.appendChild(titleText);
 
   const closeButton = document.createElement("button");
   closeButton.textContent = "Close";
-  closeButton.style.position = "absolute";
-  closeButton.style.top = "10px";
-  closeButton.style.right = "10px";
-  closeButton.style.padding = "5px 10px";
-  closeButton.style.border = "none";
-  closeButton.style.borderRadius = "4px";
-  closeButton.style.backgroundColor = "#007bff";
-  closeButton.style.color = "white";
-  closeButton.style.cursor = "pointer";
+  closeButton.className = "close-btn";
   closeButton.onclick = () => {
     document.body.removeChild(modal);
   };
-  modal.appendChild(closeButton);
+  title.appendChild(closeButton);
+
+  modal.appendChild(title);
+
+  const content = document.createElement("div");
+  content.className = "modal-content";
+  content.style.paddingTop = "10px";
+
+  const spaceDistanceText = document.createElement("p");
+  spaceDistanceText.textContent = `Space Distance: ${spaceDistance} km`;
+  content.appendChild(spaceDistanceText);
+
+  const planeDistanceText = document.createElement("p");
+  planeDistanceText.textContent = `Plane Distance: ${planeDistance} km`;
+  content.appendChild(planeDistanceText);
+
+  modal.appendChild(content);
 
   document.body.appendChild(modal);
 }

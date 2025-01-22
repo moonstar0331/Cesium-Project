@@ -115,18 +115,6 @@ async function getServiceArea(viewer, cartographic) {
 function displayServiceAreaInfo(serviceAreaInfo) {
   const modal = document.createElement("div");
   modal.className = "service-area-modal";
-  modal.style.position = "fixed";
-  modal.style.top = "50%";
-  modal.style.right = "20px";
-  modal.style.transform = "translateY(-50%)";
-  modal.style.width = "300px";
-  modal.style.padding = "20px";
-  modal.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
-  modal.style.border = "1px solid #ccc";
-  modal.style.borderRadius = "8px";
-  modal.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
-  modal.style.zIndex = "1000";
-  modal.style.fontFamily = "Arial, sans-serif";
 
   const title = document.createElement("h3");
   title.textContent = "Service Area Information";
@@ -141,15 +129,7 @@ function displayServiceAreaInfo(serviceAreaInfo) {
 
   const closeButton = document.createElement("button");
   closeButton.textContent = "Close";
-  closeButton.style.position = "absolute";
-  closeButton.style.top = "10px";
-  closeButton.style.right = "10px";
-  closeButton.style.padding = "5px 10px";
-  closeButton.style.border = "none";
-  closeButton.style.borderRadius = "4px";
-  closeButton.style.backgroundColor = "#007bff";
-  closeButton.style.color = "white";
-  closeButton.style.cursor = "pointer";
+  closeButton.className = "close-btn";
   closeButton.onclick = () => {
     document.body.removeChild(modal);
   };
