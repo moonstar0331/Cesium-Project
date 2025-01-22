@@ -38,8 +38,6 @@ export function analysisDistance(viewer, handler, positions, click) {
       var spaceDistance = calculateSpaceDistance(positions[0], positions[1]);
       var planeDistance = calculatePlaneDistance(positions[0], positions[1]);
 
-      console.log("2개");
-
       // polyline 생성
       viewer.entities.add({
         polyline: {
