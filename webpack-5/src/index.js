@@ -230,7 +230,7 @@ const lat = document.getElementById("lat");
 const lng = document.getElementById("lng");
 const elev = document.getElementById("elev");
 
-// 화면 우측 하단 위경도 표시
+// 화면 우측 하단 위경도 및 높이 표시
 box.addEventListener(
   "mousemove",
   function (event) {
@@ -243,15 +243,16 @@ box.addEventListener(
       const longitude = CesiumMath.toDegrees(cartographic.longitude).toFixed(4);
       const latitude = CesiumMath.toDegrees(cartographic.latitude).toFixed(4);
 
-      const altitude = viewer.scene.globe
-        ?.getHeight(
-          Cartographic.fromDegrees(parseFloat(longitude), parseFloat(latitude)),
-        )
-        ?.toFixed(2);
+      // const altitude = viewer.scene.globe
+      //   ?.getHeight(
+      //     Cartographic.fromDegrees(parseFloat(longitude), parseFloat(latitude)),
+      //   )
+      //   ?.toFixed(2);
+      const elevation = viewer.scene.globe?.getHeight(cartographic).toFixed(2);
 
       lat.innerHTML = latitude;
       lng.innerHTML = longitude;
-      elev.innerHTML = altitude;
+      elev.innerHTML = elevation;
     }
   },
   false,

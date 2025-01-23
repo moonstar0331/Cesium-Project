@@ -16,6 +16,40 @@ body {
   position: relative; /* Add this line */
 }
 
+.toolbar {
+  position: fixed;
+  top: 65%;
+  right: 0;
+  transform: translateY(-50%);
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.tool-btn {
+  border: none;
+  border-radius: 5px;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: Pretendard;
+  flex: 1; /* Add this line */
+  background-color: #1d242df2;
+}
+
+.toolbar button {
+  display: block;
+  margin: 5px 0;
+  width: 100%;
+}
+
+.toolbar button img {
+  width: 20px;
+}
+
 .btn-container {
   display: flex;
   justify-content: space-between;
