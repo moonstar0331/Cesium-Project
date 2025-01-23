@@ -294,6 +294,69 @@ addEventListenerById("measure-planar", "click", () => {
   }, ScreenSpaceEventType.LEFT_CLICK);
 });
 
+// 우측 툴바 (측정) - 면적 측정
+addEventListenerById("measure-area", "click", () => {
+  console.log("asd");
+  const measureModal = document.getElementById("measure-modal");
+  measureModal.style.display = "none";
+
+  let areaPositions = [];
+  let positions = [];
+
+  var handler = new ScreenSpaceEventHandler(viewer.canvas);
+
+  // 면적 계산 기능 OFF
+  handler.setInputAction(function (click) {
+    positions = [];
+    handler.destroy();
+  }, ScreenSpaceEventType.RIGHT_CLICK);
+
+  // 면적 계산 기능 ON
+  handler.setInputAction((click) => {
+    let pickedPosition = viewer.scene.pickPosition(click.position);
+
+    // 클릭한 좌표가 유효한지 확인
+    if (defined(pickedPosition)) {
+      areaPositions.push(pickedPosition);
+      positions.push(pickedPosition);
+
+      // positions 리스트가 2개가 되면 polyline 생성
+      if (positions.length === 2) {
+        // polyline 생성
+        viewer.entities.add({
+          polyline: {
+            positions: positions,
+            material: Color.RED,
+            width: 3,
+            clampToGround: false,
+            zIndex: Number.POSITIVE_INFINITY,
+          },
+        });
+
+        // positions의 0번 인덱스 값을 지우기;
+        positions.shift();
+      }
+
+      // 1. areaPositions.length가 2개면 + 마우스 위치
+      // 1-1. 마우스 위치가 타당한지
+      // 2. 3개 이상이면 그대로
+      if (areaPositions.length >= 3) {
+        areaPositions.push(areaPositions[0]);
+        viewer.entities.add({
+          polygon: {
+            hierarchy: areaPositions,
+            material: Color.RED.withAlpha(0.5),
+            perPositionHeight: true,
+          },
+        });
+        positions = [];
+        areaPositions = [];
+        handler.destroy();
+      }
+    }
+  }, ScreenSpaceEventType.LEFT_CLICK);
+});
+
 // 우측 툴바 (화면 분할) - 추가구현필요
 var isScreenSplit = false;
 document.getElementById("splitScreen").addEventListener("click", () => {
