@@ -259,6 +259,38 @@ box.addEventListener(
   false,
 );
 
+// 우측 툴바 (측정)
+document.getElementById("measure").addEventListener("click", () => {
+  const measureModal = document.getElementById("measure-modal");
+
+  if (measureModal.style.display === "none") {
+    measureModal.style.display = "block";
+  } else {
+    measureModal.style.display = "none";
+  }
+});
+
+// 우측 툴바 (측정) - 거리 측정
+addEventListenerById("measure-planar", "click", () => {
+  const measureModal = document.getElementById("measure-modal");
+  measureModal.style.display = "none";
+
+  let positions = [];
+
+  var handler = new ScreenSpaceEventHandler(viewer.canvas);
+
+  // 거리 계산 기능 OFF
+  handler.setInputAction(function (click) {
+    positions = [];
+    handler.destroy();
+  }, ScreenSpaceEventType.RIGHT_CLICK);
+
+  // 거리 계산 기능 ON
+  handler.setInputAction((click) => {
+    analysisDistance(viewer, handler, positions, click);
+  }, ScreenSpaceEventType.LEFT_CLICK);
+});
+
 // 우측 툴바 (화면 분할)
 var isScreenSplit = false;
 document.getElementById("splitScreen").addEventListener("click", () => {
@@ -277,6 +309,7 @@ document.getElementById("splitScreen").addEventListener("click", () => {
   viewer.scene.splitPosition =
     slider.offsetLeft / slider.parentElement.offsetWidth;
 
+  // @ts-ignore
   const handler = new ScreenSpaceEventHandler(slider);
 
   let moveActive = false;

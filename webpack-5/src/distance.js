@@ -64,7 +64,7 @@ export function analysisDistance(viewer, handler, positions, click) {
         },
       });
 
-      displayDistances(spaceDistance, planeDistance);
+      // displayDistances(spaceDistance, planeDistance);
 
       // 위치 초기화
       positions = [];
