@@ -263,7 +263,10 @@ box.addEventListener(
 document.getElementById("measure").addEventListener("click", () => {
   const measureModal = document.getElementById("measure-modal");
 
-  if (measureModal.style.display === "none") {
+  if (
+    measureModal.style.display === "none" ||
+    measureModal.style.display === ""
+  ) {
     measureModal.style.display = "block";
   } else {
     measureModal.style.display = "none";
@@ -291,7 +294,7 @@ addEventListenerById("measure-planar", "click", () => {
   }, ScreenSpaceEventType.LEFT_CLICK);
 });
 
-// 우측 툴바 (화면 분할)
+// 우측 툴바 (화면 분할) - 추가구현필요
 var isScreenSplit = false;
 document.getElementById("splitScreen").addEventListener("click", () => {
   const layers = viewer.imageryLayers;
