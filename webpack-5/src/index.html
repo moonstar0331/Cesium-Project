@@ -4,7 +4,9 @@
     <meta charset="utf-8" />
   </head>
   <body>
-    <div id="cesiumContainer"></div>
+    <div id="cesiumContainer">
+      <div id="slider"></div>
+    </div>
     <div class="box-container">
       <button id="terrain" class="btn">Terrain Analysis</button>
       <button id="toggle-building" class="btn">Toggle Building</button>
@@ -17,25 +19,25 @@
       </div>
     </div>
     <div class="toolbar">
-      <button id="terrain" class="tool-btn"><img src="./layers.png" /></button>
-      <button id="toggle-building" class="tool-btn">
+      <button id="layers" class="tool-btn"><img src="./layers.png" /></button>
+      <button id="measure" class="tool-btn">
         <img src="./measure.png" />
       </button>
-      <button id="travel-time" class="tool-btn">
+      <button id="3dLibrary" class="tool-btn">
         <img src="./3dLibrary.png" />
       </button>
-      <button id="elevation" class="tool-btn">
+      <button id="splitScreen" class="tool-btn">
         <img src="./splitScreen.png" />
       </button>
-      <button id="clear" class="tool-btn">
+      <button id="otherTools" class="tool-btn">
         <img src="./otherTools.png" />
       </button>
-      <button id="clear2" class="tool-btn">
+      <button id="cadastralMap" class="tool-btn">
         <img src="./cadastralMap.png" />
       </button>
-      <button id="clear2" class="tool-btn"><img src="./zoomIn.png" /></button>
-      <button id="clear2" class="tool-btn"><img src="./zoomOut.png" /></button>
-      <button id="clear2" class="tool-btn">
+      <button id="zoomIn" class="tool-btn"><img src="./zoomIn.png" /></button>
+      <button id="zoomOut" class="tool-btn"><img src="./zoomOut.png" /></button>
+      <button id="fullScreen" class="tool-btn">
         <img src="./fullScreen.png" />
       </button>
     </div>

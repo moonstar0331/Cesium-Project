@@ -14,6 +14,7 @@ import {
   Terrain,
   Color,
   defined,
+  Fullscreen,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
@@ -257,3 +258,77 @@ box.addEventListener(
   },
   false,
 );
+
+// 우측 툴바 (화면 분할)
+var isScreenSplit = false;
+document.getElementById("splitScreen").addEventListener("click", () => {
+  const layers = viewer.imageryLayers;
+
+  const slider = document.getElementById("slider");
+
+  if (isScreenSplit) {
+    slider.style.display = "none";
+    isScreenSplit = false;
+    return;
+  }
+
+  slider.style.display = "block";
+  isScreenSplit = true;
+  viewer.scene.splitPosition =
+    slider.offsetLeft / slider.parentElement.offsetWidth;
+
+  const handler = new ScreenSpaceEventHandler(slider);
+
+  let moveActive = false;
+
+  function sliderMove(movement) {
+    if (!moveActive) {
+      return;
+    }
+
+    const relativeOffset = movement.endPosition.x;
+    const splitPosition =
+      (slider.offsetLeft + relativeOffset) / slider.parentElement.offsetWidth;
+    slider.style.left = `${100.0 * splitPosition}%`;
+    viewer.scene.splitPosition = splitPosition;
+  }
+
+  handler.setInputAction(function () {
+    moveActive = true;
+  }, ScreenSpaceEventType.LEFT_DOWN);
+  handler.setInputAction(function () {
+    moveActive = true;
+  }, ScreenSpaceEventType.PINCH_START);
+
+  handler.setInputAction(sliderMove, ScreenSpaceEventType.MOUSE_MOVE);
+  handler.setInputAction(sliderMove, ScreenSpaceEventType.PINCH_MOVE);
+
+  handler.setInputAction(function () {
+    moveActive = false;
+  }, ScreenSpaceEventType.LEFT_UP);
+  handler.setInputAction(function () {
+    moveActive = false;
+  }, ScreenSpaceEventType.PINCH_END);
+});
+
+// 우측 툴바 (줌 인)
+document.getElementById("zoomIn").addEventListener("click", () => {
+  viewer.camera.zoomIn();
+});
+
+// 우측 툴바 (줌 아웃)
+document.getElementById("zoomOut").addEventListener("click", () => {
+  viewer.camera.zoomOut();
+});
+
+// 우측 툴바 (풀스크린)
+var isFullScreen = false;
+document.getElementById("fullScreen").addEventListener("click", () => {
+  if (isFullScreen) {
+    Fullscreen.exitFullscreen();
+    isFullScreen = false;
+  } else {
+    Fullscreen.requestFullscreen(document.body);
+    isFullScreen = true;
+  }
+});
