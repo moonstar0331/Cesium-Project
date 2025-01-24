@@ -29,7 +29,7 @@ import { AnalysisServiceArea } from "./serviceArea";
 import { updateDisplay } from "./elevation";
 import {
   addEventListenerById,
-  cloaseToolModal,
+  closeToolModal,
   closeModal,
   displayTerrainAnalysisModal,
 } from "./modal";
@@ -266,7 +266,7 @@ box.addEventListener(
 
 // 우측 툴바 (측정)
 document.getElementById("measure").addEventListener("click", () => {
-  cloaseToolModal();
+  closeToolModal();
   const measureModal = document.getElementById("measure-modal");
 
   if (
@@ -414,7 +414,7 @@ document.getElementById("splitScreen").addEventListener("click", () => {
 
 // 우측 툴바 (Other Tools)
 document.getElementById("otherTools").addEventListener("click", () => {
-  cloaseToolModal();
+  closeToolModal();
   const otherToolModal = document.getElementById("other-tools");
 
   if (
@@ -425,6 +425,24 @@ document.getElementById("otherTools").addEventListener("click", () => {
   } else {
     otherToolModal.style.display = "none";
   }
+});
+
+// 우측 툴바 (Other Tools) - 스크린샷
+document.getElementById("screenshot").addEventListener("click", () => {
+  closeToolModal();
+
+  viewer.render();
+  const canvas = viewer.canvas;
+  canvas.toBlob((blob) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "screenshot.png";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
 });
 
 // 우측 툴바 (줌 인)

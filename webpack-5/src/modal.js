@@ -63,7 +63,7 @@ export function closeModal() {
 }
 
 // 툴 모달 닫기 함수
-export function cloaseToolModal() {
+export function closeToolModal() {
   const toolModals = document.querySelectorAll(".tool-modal");
   toolModals.forEach((modal) => {
     // @ts-ignore
