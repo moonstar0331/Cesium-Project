@@ -22,7 +22,7 @@ function calculatePlaneDistance(position1, position2) {
 function calculateSpaceDistance(position1, position2) {
   const spaceDistance = (
     Cartesian3.distance(position1, position2) / 1000
-  ).toFixed(3);
+  )?.toFixed(3);
 
   return spaceDistance.toLocaleString();
 }

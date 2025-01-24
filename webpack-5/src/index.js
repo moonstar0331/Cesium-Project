@@ -206,25 +206,25 @@ document.getElementById("travel-time").addEventListener("click", () => {
 });
 
 // Elevation 버튼 이벤트 이벤트
-var isElevation = false;
-const updateDisplayHandler = (event) => updateDisplay(viewer, event);
+// var isElevation = false;
+// const updateDisplayHandler = (event) => updateDisplay(viewer, event);
 
-document.getElementById("elevation").addEventListener("click", () => {
-  if (isElevation) {
-    box.removeEventListener("mousemove", updateDisplayHandler, false);
-    viewer.entities.removeById("coordinate");
-    isElevation = false;
-  } else {
-    box.addEventListener("mousemove", updateDisplayHandler, false);
-    isElevation = true;
-  }
+// document.getElementById("elevation").addEventListener("click", () => {
+//   if (isElevation) {
+//     box.removeEventListener("mousemove", updateDisplayHandler, false);
+//     viewer.entities.removeById("coordinate");
+//     isElevation = false;
+//   } else {
+//     box.addEventListener("mousemove", updateDisplayHandler, false);
+//     isElevation = true;
+//   }
 
-  viewer.screenSpaceEventHandler.setInputAction(() => {
-    box.removeEventListener("mousemove", updateDisplayHandler, false);
-    viewer.entities.removeById("coordinate");
-    isElevation = false;
-  }, ScreenSpaceEventType.RIGHT_CLICK);
-});
+//   viewer.screenSpaceEventHandler.setInputAction(() => {
+//     box.removeEventListener("mousemove", updateDisplayHandler, false);
+//     viewer.entities.removeById("coordinate");
+//     isElevation = false;
+//   }, ScreenSpaceEventType.RIGHT_CLICK);
+// });
 
 // Clear all polylines when the clear button is clicked
 document.getElementById("clear").addEventListener("click", () => {
@@ -247,15 +247,17 @@ box.addEventListener(
     );
     if (cartesian) {
       const cartographic = Cartographic.fromCartesian(cartesian);
-      const longitude = CesiumMath.toDegrees(cartographic.longitude).toFixed(4);
-      const latitude = CesiumMath.toDegrees(cartographic.latitude).toFixed(4);
+      const longitude = CesiumMath.toDegrees(cartographic.longitude)?.toFixed(
+        4,
+      );
+      const latitude = CesiumMath.toDegrees(cartographic.latitude)?.toFixed(4);
 
       // const altitude = viewer.scene.globe
       //   ?.getHeight(
       //     Cartographic.fromDegrees(parseFloat(longitude), parseFloat(latitude)),
       //   )
       //   ?.toFixed(2);
-      const elevation = viewer.scene.globe?.getHeight(cartographic).toFixed(2);
+      const elevation = viewer.scene.globe?.getHeight(cartographic)?.toFixed(2);
 
       lat.innerHTML = latitude;
       lng.innerHTML = longitude;
@@ -334,6 +336,29 @@ addEventListenerById("measure-area", "click", () => {
       }
     }
   }, ScreenSpaceEventType.LEFT_CLICK);
+});
+
+// 우측 툴바 (측정) - Elevation 측정
+var isElevation = false;
+const updateDisplayHandler = (event) => updateDisplay(viewer, event);
+addEventListenerById("measure-elevation", "click", () => {
+  const measureModal = document.getElementById("measure-modal");
+  measureModal.style.display = "none";
+
+  if (isElevation) {
+    box.removeEventListener("mousemove", updateDisplayHandler, false);
+    viewer.entities.removeById("coordinate");
+    isElevation = false;
+  } else {
+    box.addEventListener("mousemove", updateDisplayHandler, false);
+    isElevation = true;
+  }
+
+  viewer.screenSpaceEventHandler.setInputAction(() => {
+    box.removeEventListener("mousemove", updateDisplayHandler, false);
+    viewer.entities.removeById("coordinate");
+    isElevation = false;
+  }, ScreenSpaceEventType.RIGHT_CLICK);
 });
 
 // 우측 툴바 (화면 분할) - 추가구현필요
