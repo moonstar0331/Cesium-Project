@@ -6,6 +6,9 @@ import {
   Cartographic,
   ConstantPositionProperty,
   ConstantProperty,
+  LabelStyle,
+  VerticalOrigin,
+  HorizontalOrigin,
 } from "cesium";
 
 // Elavation Coordinate Label Display Function
@@ -16,14 +19,9 @@ export function updateDisplay(viewer, event) {
   );
   if (cartesian) {
     const cartographic = Cartographic.fromCartesian(cartesian);
+
     const longitude = CesiumMath.toDegrees(cartographic.longitude)?.toFixed(4);
     const latitude = CesiumMath.toDegrees(cartographic.latitude)?.toFixed(4);
-    // const altitude = viewer.scene.globe
-    //   .getHeight(
-    //     Cartographic.fromDegrees(parseFloat(longitude), parseFloat(latitude)),
-    //   )
-    //   ?.toFixed(2);
-
     const elevation = viewer.scene.globe?.getHeight(cartographic)?.toFixed(2);
 
     const coord = viewer.entities.getById("coordinate");
@@ -37,13 +35,23 @@ export function updateDisplay(viewer, event) {
       viewer.entities.add({
         id: "coordinate",
         position: cartesian,
+        point: {
+          pixelSize: 10,
+          color: Color.RED,
+        },
         label: {
           text: `${longitude} ${latitude} ${elevation}`,
-          font: "14px sans-serif",
-          fillColor: Color.RED,
+          font: "16px Arial",
+          fillColor: Color.WHITE,
           outlineColor: Color.BLACK,
+          outlineWidth: 2,
           showBackground: true,
-          pixelOffset: new Cartesian2(0, -20),
+          backgroundColor: new Color(0.165, 0.165, 0.165, 0.8),
+          backgroundPadding: new Cartesian2(7, 5),
+          pixelOffset: new Cartesian2(0, -25),
+          style: LabelStyle.FILL_AND_OUTLINE,
+          verticalOrigin: VerticalOrigin.BOTTOM,
+          horizontalOrigin: HorizontalOrigin.CENTER,
         },
       });
     }
