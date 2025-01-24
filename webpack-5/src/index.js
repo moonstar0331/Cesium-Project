@@ -445,6 +445,23 @@ document.getElementById("screenshot").addEventListener("click", () => {
   });
 });
 
+// 우측 툴바 (Other Tools) - 그리기 도구
+document.getElementById("drawing-tool").addEventListener("click", () => {
+  closeToolModal();
+
+  // 그리기 도구 모달 창 생성
+
+  // 점
+
+  // 선
+
+  // 면
+
+  // 사각형
+
+  // 원
+});
+
 // 우측 툴바 (줌 인)
 document.getElementById("zoomIn").addEventListener("click", () => {
   viewer.camera.zoomIn();

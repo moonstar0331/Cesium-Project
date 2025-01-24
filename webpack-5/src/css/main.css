@@ -250,3 +250,45 @@ body {
   padding: 5px;
   cursor: pointer;
 }
+
+.drawing-modal {
+  position: fixed;
+  top: 40%;
+  left: 20px;
+  transform: translateY(-50%);
+  width: 300px;
+  height: 500px;
+  padding: 20px;
+  background-color: #1d242de6;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  font-family: Arial, sans-serif;
+}
+
+.tools {
+  padding: 12px 0;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+#draw-point {
+  background-image: url("../public/draw-point.png");
+}
+
+#draw-line {
+  background-image: "./draw-line.png";
+}
+
+#draw-polygon {
+  background-image: "./draw-polygon.png";
+}
+
+#draw-rectangle {
+  background-image: "./draw-rectangle.png";
+}
+
+#draw-circle {
+  background-image: "./draw-circle.png";
+}
