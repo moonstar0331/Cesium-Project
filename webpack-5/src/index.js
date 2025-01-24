@@ -27,7 +27,12 @@ import {
 } from "./measure";
 import { AnalysisServiceArea } from "./serviceArea";
 import { updateDisplay } from "./elevation";
-import { addEventListenerById, displayTerrainAnalysisModal } from "./modal";
+import {
+  addEventListenerById,
+  cloaseToolModal,
+  closeModal,
+  displayTerrainAnalysisModal,
+} from "./modal";
 
 // Math as CesiumMath
 
@@ -132,14 +137,6 @@ document.getElementById("terrain").addEventListener("click", () => {
     }, ScreenSpaceEventType.MOUSE_MOVE);
   });
 });
-
-// 모달 창 닫기 함수
-function closeModal() {
-  const modals = document.querySelectorAll(".modal");
-  modals.forEach((modal) => {
-    document.body.removeChild(modal);
-  });
-}
 
 // Toggle Buildings
 document
@@ -269,6 +266,7 @@ box.addEventListener(
 
 // 우측 툴바 (측정)
 document.getElementById("measure").addEventListener("click", () => {
+  cloaseToolModal();
   const measureModal = document.getElementById("measure-modal");
 
   if (
@@ -416,6 +414,7 @@ document.getElementById("splitScreen").addEventListener("click", () => {
 
 // 우측 툴바 (Other Tools)
 document.getElementById("otherTools").addEventListener("click", () => {
+  cloaseToolModal();
   const otherToolModal = document.getElementById("other-tools");
 
   if (

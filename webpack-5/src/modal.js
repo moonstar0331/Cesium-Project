@@ -53,3 +53,20 @@ export function addEventListenerById(id, event, handler) {
     console.error(`Element with id ${id} not found.`);
   }
 }
+
+// 모달 창 닫기 함수
+export function closeModal() {
+  const modals = document.querySelectorAll(".modal");
+  modals.forEach((modal) => {
+    document.body.removeChild(modal);
+  });
+}
+
+// 툴 모달 닫기 함수
+export function cloaseToolModal() {
+  const toolModals = document.querySelectorAll(".tool-modal");
+  toolModals.forEach((modal) => {
+    // @ts-ignore
+    modal.style.display = "none";
+  });
+}
