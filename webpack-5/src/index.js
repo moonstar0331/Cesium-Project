@@ -414,6 +414,20 @@ document.getElementById("splitScreen").addEventListener("click", () => {
   }, ScreenSpaceEventType.PINCH_END);
 });
 
+// 우측 툴바 (Other Tools)
+document.getElementById("otherTools").addEventListener("click", () => {
+  const otherToolModal = document.getElementById("other-tools");
+
+  if (
+    otherToolModal.style.display === "none" ||
+    otherToolModal.style.display === ""
+  ) {
+    otherToolModal.style.display = "block";
+  } else {
+    otherToolModal.style.display = "none";
+  }
+});
+
 // 우측 툴바 (줌 인)
 document.getElementById("zoomIn").addEventListener("click", () => {
   viewer.camera.zoomIn();
