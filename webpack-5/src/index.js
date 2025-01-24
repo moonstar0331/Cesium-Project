@@ -311,46 +311,7 @@ addEventListenerById("measure-area", "click", () => {
   // 면적 계산 기능 OFF
   handler.setInputAction(function (click) {
     if (areaPositions.length >= 3) {
-      areaPositions.push(areaPositions[0]);
-
-      for (let i = 0; i < areaPositions.length - 1; i++) {
-        viewer.entities.add({
-          polyline: {
-            positions: [areaPositions[i], areaPositions[i + 1]],
-            material: Color.RED,
-            width: 3,
-            clampToGround: false,
-            zIndex: Number.POSITIVE_INFINITY,
-          },
-        });
-      }
-
-      viewer.entities.add({
-        polygon: {
-          hierarchy: areaPositions,
-          material: Color.RED.withAlpha(0.5),
-          perPositionHeight: true,
-        },
-      });
-
-      var area = calculateArea(areaPositions);
-      console.log(area);
-
-      viewer.entities.add({
-        position: Cartesian3.midpoint(
-          areaPositions[areaPositions.length - 2],
-          areaPositions[areaPositions.length - 1],
-          new Cartesian3(),
-        ),
-        label: {
-          text: area + "m2",
-          font: "20px sans-serif",
-          fillColor: Color.RED,
-          outlineColor: Color.BLACK,
-          showBackground: true,
-          pixelOffset: new Cartesian2(0, -20),
-        },
-      });
+      measureArea(viewer, areaPositions);
     }
     areaPositions = [];
     handler.destroy();
@@ -358,7 +319,20 @@ addEventListenerById("measure-area", "click", () => {
 
   // 면적 계산 기능 ON
   handler.setInputAction((click) => {
-    measureArea(viewer, handler, areaPositions, click);
+    let pickedPosition = viewer.scene.pickPosition(click.position);
+
+    // 클릭한 좌표가 유효한지 확인
+    if (defined(pickedPosition)) {
+      areaPositions.push(pickedPosition);
+
+      if (areaPositions.length >= 10) {
+        measureArea(viewer, areaPositions);
+
+        // 초기화
+        areaPositions = [];
+        handler.destroy();
+      }
+    }
   }, ScreenSpaceEventType.LEFT_CLICK);
 });
 
