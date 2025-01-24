@@ -4,6 +4,9 @@ import {
   defined,
   Color,
   Cartesian2,
+  PolygonGeometry,
+  Cartographic,
+  Ellipsoid,
 } from "cesium";
 
 // 2차원 거리 계산
@@ -12,7 +15,7 @@ function calculatePlaneDistance(position1, position2) {
   const dy = position2.y - position1.y;
   const planeDistance = (Math.sqrt(dx * dx + dy * dy) / 1000).toFixed(3);
 
-  return planeDistance;
+  return planeDistance.toLocaleString();
 }
 
 // 3차원 거리 계산
@@ -21,7 +24,44 @@ function calculateSpaceDistance(position1, position2) {
     Cartesian3.distance(position1, position2) / 1000
   ).toFixed(3);
 
-  return spaceDistance;
+  return spaceDistance.toLocaleString();
+}
+
+// 면적 계산
+export function calculateArea(areaPositions) {
+  // Cartesian3 -> Cartographic 변환
+  const cartographicPositions = areaPositions.map((position) =>
+    Cartographic.fromCartesian(position),
+  );
+
+  // 면적 계산에 필요한 좌표 배열 생성
+  const coordinates = cartographicPositions.map((pos) => [
+    pos.longitude,
+    pos.latitude,
+  ]);
+
+  // 지구 타원체 (WGS84) 정의
+  const ellipsoid = Ellipsoid.WGS84;
+
+  let area = 0;
+
+  // 면적 계산 (지구 타원체 고려)
+  for (let i = 0; i < coordinates.length; i++) {
+    const [lon1, lat1] = coordinates[i];
+    const [lon2, lat2] = coordinates[(i + 1) % coordinates.length];
+
+    const lambda1 = lon1;
+    const phi1 = lat1;
+    const lambda2 = lon2;
+    const phi2 = lat2;
+
+    area += lambda2 - (lambda1 * (2 + Math.sin(phi1) + Math.sin(phi2))) / 2;
+
+    // 면적을 절대값으로 변환하고 지구 타원체 반지름으로 스케일링
+    area = Math.abs(area) * ellipsoid.maximumRadius ** 2;
+
+    return area.toLocaleString(); // 결과는 평방미터 단위
+  }
 }
 
 export function analysisDistance(viewer, handler, positions, click) {
@@ -55,7 +95,7 @@ export function analysisDistance(viewer, handler, positions, click) {
           new Cartesian3(),
         ),
         label: {
-          text: spaceDistance + "km",
+          text: planeDistance + "km",
           font: "20px sans-serif",
           fillColor: Color.RED,
           outlineColor: Color.BLACK,
@@ -203,6 +243,25 @@ export function measureArea(viewer, handler, areaPositions, click) {
           hierarchy: areaPositions,
           material: Color.RED.withAlpha(0.5),
           perPositionHeight: true,
+        },
+      });
+
+      var area = calculateArea(areaPositions);
+      console.log(area);
+
+      viewer.entities.add({
+        position: Cartesian3.midpoint(
+          areaPositions[areaPositions.length - 2],
+          areaPositions[areaPositions.length - 1],
+          new Cartesian3(),
+        ),
+        label: {
+          text: area + "m2",
+          font: "20px sans-serif",
+          fillColor: Color.RED,
+          outlineColor: Color.BLACK,
+          showBackground: true,
+          pixelOffset: new Cartesian2(0, -20),
         },
       });
 

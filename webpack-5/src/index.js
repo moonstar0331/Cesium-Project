@@ -15,12 +15,14 @@ import {
   Color,
   defined,
   Fullscreen,
+  Cartesian3,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
 import {
   analysisDistance,
   analysisTerrainProfile,
+  calculateArea,
   measureArea,
 } from "./measure";
 import { AnalysisServiceArea } from "./serviceArea";
@@ -328,6 +330,25 @@ addEventListenerById("measure-area", "click", () => {
           hierarchy: areaPositions,
           material: Color.RED.withAlpha(0.5),
           perPositionHeight: true,
+        },
+      });
+
+      var area = calculateArea(areaPositions);
+      console.log(area);
+
+      viewer.entities.add({
+        position: Cartesian3.midpoint(
+          areaPositions[areaPositions.length - 2],
+          areaPositions[areaPositions.length - 1],
+          new Cartesian3(),
+        ),
+        label: {
+          text: area + "m2",
+          font: "20px sans-serif",
+          fillColor: Color.RED,
+          outlineColor: Color.BLACK,
+          showBackground: true,
+          pixelOffset: new Cartesian2(0, -20),
         },
       });
     }
