@@ -18,7 +18,11 @@ import {
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
-import { analysisDistance, analysisTerrainProfile } from "./distance";
+import {
+  analysisDistance,
+  analysisTerrainProfile,
+  measureArea,
+} from "./measure";
 import { AnalysisServiceArea } from "./serviceArea";
 import { updateDisplay } from "./elevation";
 import { addEventListenerById, displayTerrainAnalysisModal } from "./modal";
@@ -296,64 +300,44 @@ addEventListenerById("measure-planar", "click", () => {
 
 // 우측 툴바 (측정) - 면적 측정
 addEventListenerById("measure-area", "click", () => {
-  console.log("asd");
   const measureModal = document.getElementById("measure-modal");
   measureModal.style.display = "none";
 
   let areaPositions = [];
-  let positions = [];
-
   var handler = new ScreenSpaceEventHandler(viewer.canvas);
 
   // 면적 계산 기능 OFF
   handler.setInputAction(function (click) {
-    positions = [];
-    handler.destroy();
-  }, ScreenSpaceEventType.RIGHT_CLICK);
+    if (areaPositions.length >= 3) {
+      areaPositions.push(areaPositions[0]);
 
-  // 면적 계산 기능 ON
-  handler.setInputAction((click) => {
-    let pickedPosition = viewer.scene.pickPosition(click.position);
-
-    // 클릭한 좌표가 유효한지 확인
-    if (defined(pickedPosition)) {
-      areaPositions.push(pickedPosition);
-      positions.push(pickedPosition);
-
-      // positions 리스트가 2개가 되면 polyline 생성
-      if (positions.length === 2) {
-        // polyline 생성
+      for (let i = 0; i < areaPositions.length - 1; i++) {
         viewer.entities.add({
           polyline: {
-            positions: positions,
+            positions: [areaPositions[i], areaPositions[i + 1]],
             material: Color.RED,
             width: 3,
             clampToGround: false,
             zIndex: Number.POSITIVE_INFINITY,
           },
         });
-
-        // positions의 0번 인덱스 값을 지우기;
-        positions.shift();
       }
 
-      // 1. areaPositions.length가 2개면 + 마우스 위치
-      // 1-1. 마우스 위치가 타당한지
-      // 2. 3개 이상이면 그대로
-      if (areaPositions.length >= 3) {
-        areaPositions.push(areaPositions[0]);
-        viewer.entities.add({
-          polygon: {
-            hierarchy: areaPositions,
-            material: Color.RED.withAlpha(0.5),
-            perPositionHeight: true,
-          },
-        });
-        positions = [];
-        areaPositions = [];
-        handler.destroy();
-      }
+      viewer.entities.add({
+        polygon: {
+          hierarchy: areaPositions,
+          material: Color.RED.withAlpha(0.5),
+          perPositionHeight: true,
+        },
+      });
     }
+    areaPositions = [];
+    handler.destroy();
+  }, ScreenSpaceEventType.RIGHT_CLICK);
+
+  // 면적 계산 기능 ON
+  handler.setInputAction((click) => {
+    measureArea(viewer, handler, areaPositions, click);
   }, ScreenSpaceEventType.LEFT_CLICK);
 });
 

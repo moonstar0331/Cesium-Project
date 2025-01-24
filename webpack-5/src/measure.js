@@ -173,3 +173,42 @@ function displayTerrainProfileResult(planeDistance) {
 
   document.body.appendChild(modal);
 }
+
+export function measureArea(viewer, handler, areaPositions, click) {
+  let pickedPosition = viewer.scene.pickPosition(click.position);
+
+  // 클릭한 좌표가 유효한지 확인
+  if (defined(pickedPosition)) {
+    areaPositions.push(pickedPosition);
+
+    if (areaPositions.length >= 10) {
+      areaPositions.push(areaPositions[0]);
+
+      // polyline 생성
+      for (let i = 0; i < areaPositions.length - 1; i++) {
+        viewer.entities.add({
+          polyline: {
+            positions: [areaPositions[i], areaPositions[i + 1]],
+            material: Color.RED,
+            width: 3,
+            clampToGround: false,
+            zIndex: Number.POSITIVE_INFINITY,
+          },
+        });
+      }
+
+      // polygon 생성
+      viewer.entities.add({
+        polygon: {
+          hierarchy: areaPositions,
+          material: Color.RED.withAlpha(0.5),
+          perPositionHeight: true,
+        },
+      });
+
+      // 초기화
+      areaPositions = [];
+      handler.destroy();
+    }
+  }
+}
