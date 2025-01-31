@@ -452,7 +452,27 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
   // 그리기 도구 모달 창 생성
   document.getElementById("drawing-modal").style.display = "block";
 
-  // 점
+  // 점 그리기
+  addEventListenerById("draw-point", "click", () => {
+    const handler = new ScreenSpaceEventHandler(viewer.canvas);
+
+    handler.setInputAction((click) => {
+      const cartesian = viewer.scene.pickPosition(click.position);
+      if (defined(cartesian)) {
+        viewer.entities.add({
+          position: cartesian,
+          point: {
+            pixelSize: 10,
+            color: Color.RED,
+          },
+        });
+      }
+    }, ScreenSpaceEventType.LEFT_CLICK);
+
+    handler.setInputAction(() => {
+      handler.destroy();
+    }, ScreenSpaceEventType.RIGHT_CLICK);
+  });
 
   // 선
 

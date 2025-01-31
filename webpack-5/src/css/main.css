@@ -252,6 +252,7 @@ body {
 }
 
 .drawing-modal {
+  display: none;
   position: fixed;
   top: 40%;
   left: 20px;
