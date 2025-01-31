@@ -345,6 +345,7 @@ addEventListenerById("measure-planar", "click", () => {
 });
 
 // 우측 툴바 (측정) - 면적 측정
+/*
 addEventListenerById("measure-area", "click", () => {
   const measureModal = document.getElementById("measure-modal");
   measureModal.style.display = "none";
@@ -378,6 +379,78 @@ addEventListenerById("measure-area", "click", () => {
       }
     }
   }, ScreenSpaceEventType.LEFT_CLICK);
+});
+*/
+addEventListenerById("measure-area", "click", () => {
+  const measureModal = document.getElementById("measure-modal");
+  measureModal.style.display = "none";
+
+  var handler = new ScreenSpaceEventHandler(viewer.canvas);
+
+  let positions = [];
+  let polylineEntity;
+  let polygonEntity;
+  let area = "0";
+
+  handler.setInputAction((click) => {
+    const cartesian = viewer.scene.pickPosition(click.position);
+    if (defined(cartesian)) {
+      positions.push(cartesian);
+      if (!polylineEntity) {
+        polylineEntity = viewer.entities.add({
+          polyline: {
+            positions: new CallbackProperty(() => positions, false),
+            material: Color.RED,
+            width: 2,
+            clampToGround: false,
+          },
+        });
+      }
+    }
+    if (!polygonEntity && positions.length >= 3) {
+      polygonEntity = viewer.entities.add({
+        polygon: {
+          hierarchy: new CallbackProperty(
+            () => new PolygonHierarchy(positions),
+            false,
+          ),
+          material: Color.RED.withAlpha(0.5),
+          perPositionHeight: true,
+        },
+      });
+    }
+  }, ScreenSpaceEventType.LEFT_CLICK);
+
+  handler.setInputAction((movement) => {
+    const cartesian = viewer.scene.pickPosition(movement.endPosition);
+    if (defined(cartesian) && positions.length > 0) {
+      if (positions.length === 1) {
+        positions[1] = cartesian;
+      } else {
+        positions[positions.length - 1] = cartesian;
+      }
+    }
+  }, ScreenSpaceEventType.MOUSE_MOVE);
+
+  handler.setInputAction(() => {
+    positions[positions.length - 1] = positions[0];
+    area = calculateArea(positions);
+    viewer.entities.add({
+      position: positions[0],
+      label: {
+        text: area + " m²",
+        font: "20px sans-serif",
+        fillColor: Color.WHITE,
+        outlineColor: Color.BLACK,
+        showBackground: true,
+        pixelOffset: new Cartesian2(0, -20),
+      },
+    });
+    polylineEntity = undefined;
+    polygonEntity = undefined;
+    handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
+    handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+  }, ScreenSpaceEventType.RIGHT_CLICK);
 });
 
 // 우측 툴바 (측정) - Elevation 측정
