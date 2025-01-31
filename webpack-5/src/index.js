@@ -474,13 +474,38 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
     }, ScreenSpaceEventType.RIGHT_CLICK);
   });
 
-  // 선
+  // 선 그리기
+  addEventListenerById("draw-line", "click", () => {
+    const handler = new ScreenSpaceEventHandler(viewer.canvas);
+    let positions = [];
 
-  // 면
+    handler.setInputAction((click) => {
+      const cartesian = viewer.scene.pickPosition(click.position);
+      if (defined(cartesian)) {
+        positions.push(cartesian);
+        if (positions.length === 2) {
+          viewer.entities.add({
+            polyline: {
+              positions: positions.slice(), // Create a copy of the positions array
+              width: 2,
+              material: Color.RED,
+            },
+          });
+          positions.shift(); // Remove the first element to allow the next line segment to be drawn
+        }
+      }
+    }, ScreenSpaceEventType.LEFT_CLICK);
 
-  // 사각형
+    handler.setInputAction(() => {
+      handler.destroy();
+    }, ScreenSpaceEventType.RIGHT_CLICK);
+  });
 
-  // 원
+  // 면 그리기
+
+  // 사각형 그리기
+
+  // 원 그리기
 });
 
 // 우측 툴바 (줌 인)
