@@ -21,6 +21,7 @@ import {
   Polyline,
   PositionProperty,
   PolygonHierarchy,
+  CallbackPositionProperty,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
@@ -288,19 +289,59 @@ addEventListenerById("measure-planar", "click", () => {
 
   let positions = [];
   let polylineEntity;
+  let distance = "0";
 
   var handler = new ScreenSpaceEventHandler(viewer.canvas);
 
-  // 거리 계산 기능 OFF
-  handler.setInputAction(function (click) {
-    positions = [];
-    handler.destroy();
-  }, ScreenSpaceEventType.RIGHT_CLICK);
-
-  // 거리 계산 기능 ON
   handler.setInputAction((click) => {
-    analysisDistance(viewer, handler, positions, click);
+    const cartesian = viewer.scene.pickPosition(click.position);
+    if (defined(cartesian)) {
+      positions.push(cartesian);
+      viewer.entities.add({
+        position: cartesian,
+        label: {
+          text: distance + "km",
+          font: "20px sans-serif",
+          fillColor: Color.WHITE,
+          outlineColor: Color.BLACK,
+          showBackground: true,
+          pixelOffset: new Cartesian2(0, -20),
+        },
+      });
+      if (!polylineEntity) {
+        polylineEntity = viewer.entities.add({
+          polyline: {
+            positions: new CallbackProperty(() => positions, false),
+            material: Color.RED,
+            width: 2,
+            clampToGround: false,
+          },
+        });
+      }
+    }
   }, ScreenSpaceEventType.LEFT_CLICK);
+
+  handler.setInputAction((movement) => {
+    const cartesian = viewer.scene.pickPosition(movement.endPosition);
+    if (defined(cartesian) && positions.length > 0) {
+      if (positions.length === 1) {
+        positions[1] = cartesian;
+      } else {
+        positions[positions.length - 1] = cartesian;
+      }
+      distance = calculatePlaneDistance(
+        positions[positions.length - 2],
+        positions[positions.length - 1],
+      );
+    }
+  }, ScreenSpaceEventType.MOUSE_MOVE);
+
+  handler.setInputAction(() => {
+    positions.pop();
+    polylineEntity = undefined;
+    handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
+    handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+  }, ScreenSpaceEventType.RIGHT_CLICK);
 });
 
 // 우측 툴바 (측정) - 면적 측정
