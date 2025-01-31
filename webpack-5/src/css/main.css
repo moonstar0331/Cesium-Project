@@ -273,22 +273,32 @@ body {
   justify-content: space-evenly;
 }
 
+.tool {
+  width: 32px;
+  height: 32px;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-position: center;
+  background-size: 80% 80%;
+  background-repeat: no-repeat;
+}
+
 #draw-point {
-  background-image: url("../public/draw-point.png");
+  background-image: url("~/public/draw-point.png");
 }
 
 #draw-line {
-  background-image: "./draw-line.png";
+  background-image: url("~/public/draw-line.png");
 }
 
 #draw-polygon {
-  background-image: "./draw-polygon.png";
+  background-image: url("~/public/draw-polygon.png");
 }
 
 #draw-rectangle {
-  background-image: "./draw-rectangle.png";
+  background-image: url("~/public/draw-rectangle.png");
 }
 
 #draw-circle {
-  background-image: "./draw-circle.png";
+  background-image: url("~/public/draw-circle.png");
 }
