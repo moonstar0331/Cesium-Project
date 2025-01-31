@@ -56,6 +56,8 @@ Ion.defaultAccessToken =
 
 const viewer = new Viewer("cesiumContainer", {
   terrain: Terrain.fromWorldTerrain(),
+  selectionIndicator: false,
+  infoBox: false,
 });
 viewer.scene.globe.depthTestAgainstTerrain = false;
 
@@ -510,6 +512,7 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
     }, ScreenSpaceEventType.MOUSE_MOVE);
 
     handler.setInputAction(() => {
+      positions.pop();
       polylineEntity = undefined;
       handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
       handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
