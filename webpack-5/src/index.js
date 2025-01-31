@@ -16,6 +16,8 @@ import {
   defined,
   Fullscreen,
   Cartesian3,
+  Rectangle,
+  CallbackProperty,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
@@ -452,10 +454,10 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
   // 그리기 도구 모달 창 생성
   document.getElementById("drawing-modal").style.display = "block";
 
+  const handler = new ScreenSpaceEventHandler(viewer.canvas);
+
   // 점 그리기
   addEventListenerById("draw-point", "click", () => {
-    const handler = new ScreenSpaceEventHandler(viewer.canvas);
-
     handler.setInputAction((click) => {
       const cartesian = viewer.scene.pickPosition(click.position);
       if (defined(cartesian)) {
@@ -476,7 +478,6 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
 
   // 선 그리기
   addEventListenerById("draw-line", "click", () => {
-    const handler = new ScreenSpaceEventHandler(viewer.canvas);
     let positions = [];
 
     handler.setInputAction((click) => {
@@ -502,8 +503,111 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
   });
 
   // 면 그리기
+  addEventListenerById("draw-polygon", "click", () => {
+    let areaPositions = [];
+
+    handler.setInputAction((click) => {
+      const cartesian = viewer.scene.pickPosition(click.position);
+
+      if (defined(cartesian)) {
+        areaPositions.push(cartesian);
+
+        if (areaPositions.length >= 10) {
+          areaPositions.push(areaPositions[0]);
+          // polyline 생성
+          for (let i = 0; i < areaPositions.length - 1; i++) {
+            viewer.entities.add({
+              polyline: {
+                positions: [areaPositions[i], areaPositions[i + 1]],
+                material: Color.RED,
+                width: 3,
+                clampToGround: false,
+                zIndex: Number.POSITIVE_INFINITY,
+              },
+            });
+          }
+
+          // polygon 생성
+          viewer.entities.add({
+            polygon: {
+              hierarchy: areaPositions,
+              material: Color.RED.withAlpha(0.5),
+              perPositionHeight: true,
+            },
+          });
+
+          areaPositions = [];
+          handler.destroy();
+        }
+      }
+    }, ScreenSpaceEventType.LEFT_CLICK);
+
+    handler.setInputAction((click) => {
+      if (areaPositions.length >= 3) {
+        areaPositions.push(areaPositions[0]);
+        // polyline 생성
+        for (let i = 0; i < areaPositions.length - 1; i++) {
+          viewer.entities.add({
+            polyline: {
+              positions: [areaPositions[i], areaPositions[i + 1]],
+              material: Color.RED,
+              width: 3,
+              clampToGround: false,
+              zIndex: Number.POSITIVE_INFINITY,
+            },
+          });
+        }
+
+        // polygon 생성
+        viewer.entities.add({
+          polygon: {
+            hierarchy: areaPositions,
+            material: Color.RED.withAlpha(0.5),
+            perPositionHeight: true,
+          },
+        });
+      }
+      areaPositions = [];
+    }, ScreenSpaceEventType.RIGHT_CLICK);
+  });
 
   // 사각형 그리기
+  addEventListenerById("draw-rectangle", "click", () => {
+    let startPosition;
+    let rectangleEntity;
+
+    handler.setInputAction((click) => {
+      const cartesian = viewer.scene.pickPosition(click.position);
+      if (defined(cartesian)) {
+        if (!startPosition) {
+          startPosition = cartesian;
+          rectangleEntity = viewer.entities.add({
+            rectangle: {
+              coordinates: new CallbackProperty(() => {
+                const endPosition = viewer.scene.pickPosition(click.position);
+                if (defined(endPosition)) {
+                  const rectangle = Rectangle.fromCartesianArray([
+                    startPosition,
+                    endPosition,
+                  ]);
+                  return rectangle;
+                }
+                return undefined;
+              }, false),
+              material: Color.RED.withAlpha(0.5),
+            },
+          });
+        } else {
+          handler.destroy();
+        }
+      }
+    }, ScreenSpaceEventType.LEFT_CLICK);
+
+    handler.setInputAction(() => {
+      startPosition = undefined;
+      handler.destroy();
+    }, ScreenSpaceEventType.RIGHT_CLICK);
+  });
 
   // 원 그리기
 });
