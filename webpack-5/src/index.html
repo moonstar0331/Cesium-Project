@@ -58,7 +58,24 @@
         <div id="draw-rectangle" class="tool"></div>
         <div id="draw-circle" class="tool"></div>
       </div>
-      <div class="modal-content"></div>
+      <div class="modal-content">
+        <div class="table-wrapper">
+          <table id="draw-table">
+            <colgroup>
+              <col style="width: 120px" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th class="draw-table-head">Drawing Format</th>
+                <th class="draw-table-head">Label</th>
+                <th class="draw-table-head">Delete</th>
+                <th class="draw-table-head">Operation</th>
+              </tr>
+            </thead>
+            <tbody class="draw-table-body"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
     <ul id="measure-modal" class="tool-modal">
       <li id="measure-planar">Measure Planar Distance</li>

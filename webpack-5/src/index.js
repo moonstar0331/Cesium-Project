@@ -362,7 +362,7 @@ addEventListenerById("measure-elevation", "click", () => {
   }, ScreenSpaceEventType.RIGHT_CLICK);
 });
 
-// 우측 툴바 (화면 분할) - 추가구현필요
+// 우측 툴바 (화면 분할) - 분할선 이동 추가구현필요
 var isScreenSplit = false;
 document.getElementById("splitScreen").addEventListener("click", () => {
   const layers = viewer.imageryLayers;
