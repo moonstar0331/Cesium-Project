@@ -450,6 +450,7 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
   closeToolModal();
 
   // 그리기 도구 모달 창 생성
+  document.getElementById("drawing-modal").style.display = "block";
 
   // 점
 

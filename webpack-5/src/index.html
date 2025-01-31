@@ -41,12 +41,12 @@
         <img src="./fullScreen.png" />
       </button>
     </div>
-    <div class="drawing-modal modal">
+    <div id="drawing-modal" class="drawing-modal modal">
       <div class="modal-title">
         <h3>Drawing Tool</h3>
         <button
           class="close-btn"
-          onclick="() => document.getElementById('drawing-modal').style.display = 'none'"
+          onclick="document.getElementById('drawing-modal').style.display='none'"
         >
           X
         </button>

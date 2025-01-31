@@ -257,14 +257,14 @@ body {
   left: 20px;
   transform: translateY(-50%);
   width: 300px;
-  height: 500px;
+  height: 400px;
   padding: 20px;
   background-color: #1d242de6;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-top: 1px solid #07c752;
+  border-radius: 10px;
+  box-shadow: 0 -3px 4px #07c75240;
   z-index: 1000;
-  font-family: Arial, sans-serif;
+  font-family: Pretendard;
 }
 
 .tools {
