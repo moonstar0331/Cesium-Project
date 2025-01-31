@@ -27,6 +27,7 @@ import {
   analysisDistance,
   analysisTerrainProfile,
   calculateArea,
+  calculatePlaneDistance,
   measureArea,
 } from "./measure";
 import { AnalysisServiceArea } from "./serviceArea";
@@ -252,12 +253,6 @@ box.addEventListener(
         4,
       );
       const latitude = CesiumMath.toDegrees(cartographic.latitude)?.toFixed(4);
-
-      // const altitude = viewer.scene.globe
-      //   ?.getHeight(
-      //     Cartographic.fromDegrees(parseFloat(longitude), parseFloat(latitude)),
-      //   )
-      //   ?.toFixed(2);
       const elevation = viewer.scene.globe?.getHeight(cartographic)?.toFixed(2);
 
       lat.innerHTML = latitude;
@@ -289,6 +284,7 @@ addEventListenerById("measure-planar", "click", () => {
   measureModal.style.display = "none";
 
   let positions = [];
+  let polylineEntity;
 
   var handler = new ScreenSpaceEventHandler(viewer.canvas);
 
@@ -474,7 +470,8 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
     }, ScreenSpaceEventType.LEFT_CLICK);
 
     handler.setInputAction(() => {
-      handler.destroy();
+      // handler.destroy();
+      handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
     }, ScreenSpaceEventType.RIGHT_CLICK);
   });
 
@@ -493,6 +490,7 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
               positions: new CallbackProperty(() => positions, false),
               material: Color.RED,
               width: 2,
+              clampToGround: false,
             },
           });
         }
@@ -502,13 +500,18 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
     handler.setInputAction((movement) => {
       const cartesian = viewer.scene.pickPosition(movement.endPosition);
       if (defined(cartesian) && positions.length > 0) {
-        positions[positions.length - 1] = cartesian;
+        if (positions.length === 1) {
+          positions[1] = cartesian;
+        } else {
+          positions[positions.length - 1] = cartesian;
+        }
       }
     }, ScreenSpaceEventType.MOUSE_MOVE);
 
     handler.setInputAction(() => {
-      positions = [];
-      handler.destroy();
+      polylineEntity = undefined;
+      handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
+      handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
     }, ScreenSpaceEventType.RIGHT_CLICK);
   });
 
@@ -619,7 +622,8 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
 
     handler.setInputAction(() => {
       startPosition = undefined;
-      handler.destroy();
+      // handler.destroy();
+      handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
     }, ScreenSpaceEventType.RIGHT_CLICK);
   });
 

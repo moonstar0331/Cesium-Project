@@ -10,7 +10,7 @@ import {
 } from "cesium";
 
 // 2차원 거리 계산
-function calculatePlaneDistance(position1, position2) {
+export function calculatePlaneDistance(position1, position2) {
   const dx = position2.x - position1.x;
   const dy = position2.y - position1.y;
   const planeDistance = (Math.sqrt(dx * dx + dy * dy) / 1000).toFixed(3);
