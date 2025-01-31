@@ -19,7 +19,7 @@ export function calculatePlaneDistance(position1, position2) {
 }
 
 // 3차원 거리 계산
-function calculateSpaceDistance(position1, position2) {
+export function calculateSpaceDistance(position1, position2) {
   const spaceDistance = (
     Cartesian3.distance(position1, position2) / 1000
   )?.toFixed(3);

@@ -30,6 +30,7 @@ import {
   analysisTerrainProfile,
   calculateArea,
   calculatePlaneDistance,
+  calculateSpaceDistance,
   measureArea,
 } from "./measure";
 import { AnalysisServiceArea } from "./serviceArea";
@@ -282,14 +283,14 @@ document.getElementById("measure").addEventListener("click", () => {
   }
 });
 
-// 우측 툴바 (측정) - 거리 측정
+// 우측 툴바 (측정) - 평면 거리 측정
 addEventListenerById("measure-planar", "click", () => {
   const measureModal = document.getElementById("measure-modal");
   measureModal.style.display = "none";
 
   let positions = [];
   let polylineEntity;
-  let distance = "0";
+  let distance;
 
   var handler = new ScreenSpaceEventHandler(viewer.canvas);
 
@@ -297,17 +298,19 @@ addEventListenerById("measure-planar", "click", () => {
     const cartesian = viewer.scene.pickPosition(click.position);
     if (defined(cartesian)) {
       positions.push(cartesian);
-      viewer.entities.add({
-        position: cartesian,
-        label: {
-          text: distance + "km",
-          font: "20px sans-serif",
-          fillColor: Color.WHITE,
-          outlineColor: Color.BLACK,
-          showBackground: true,
-          pixelOffset: new Cartesian2(0, -20),
-        },
-      });
+      if (distance !== undefined) {
+        viewer.entities.add({
+          position: cartesian,
+          label: {
+            text: distance + "km",
+            font: "20px sans-serif",
+            fillColor: Color.WHITE,
+            outlineColor: Color.BLACK,
+            showBackground: true,
+            pixelOffset: new Cartesian2(0, -20),
+          },
+        });
+      }
       if (!polylineEntity) {
         polylineEntity = viewer.entities.add({
           polyline: {
@@ -344,43 +347,71 @@ addEventListenerById("measure-planar", "click", () => {
   }, ScreenSpaceEventType.RIGHT_CLICK);
 });
 
-// 우측 툴바 (측정) - 면적 측정
-/*
-addEventListenerById("measure-area", "click", () => {
+// 우측 툴바 (측정) - 수직 거리 측정
+addEventListenerById("measure-vertical", "click", () => {
   const measureModal = document.getElementById("measure-modal");
   measureModal.style.display = "none";
 
-  let areaPositions = [];
+  let positions = [];
+  let polylineEntity;
+  let distance;
+
   var handler = new ScreenSpaceEventHandler(viewer.canvas);
 
-  // 면적 계산 기능 OFF
-  handler.setInputAction(function (click) {
-    if (areaPositions.length >= 3) {
-      measureArea(viewer, areaPositions);
-    }
-    areaPositions = [];
-    handler.destroy();
-  }, ScreenSpaceEventType.RIGHT_CLICK);
-
-  // 면적 계산 기능 ON
   handler.setInputAction((click) => {
-    let pickedPosition = viewer.scene.pickPosition(click.position);
-
-    // 클릭한 좌표가 유효한지 확인
-    if (defined(pickedPosition)) {
-      areaPositions.push(pickedPosition);
-
-      if (areaPositions.length >= 10) {
-        measureArea(viewer, areaPositions);
-
-        // 초기화
-        areaPositions = [];
-        handler.destroy();
+    const cartesian = viewer.scene.pickPosition(click.position);
+    if (defined(cartesian)) {
+      positions.push(cartesian);
+      if (distance !== undefined) {
+        viewer.entities.add({
+          position: cartesian,
+          label: {
+            text: distance + "km",
+            font: "20px sans-serif",
+            fillColor: Color.WHITE,
+            outlineColor: Color.BLACK,
+            showBackground: true,
+            pixelOffset: new Cartesian2(0, -20),
+          },
+        });
+      }
+      if (!polylineEntity) {
+        polylineEntity = viewer.entities.add({
+          polyline: {
+            positions: new CallbackProperty(() => positions, false),
+            material: Color.RED,
+            width: 2,
+            clampToGround: false,
+          },
+        });
       }
     }
   }, ScreenSpaceEventType.LEFT_CLICK);
+
+  handler.setInputAction((movement) => {
+    const cartesian = viewer.scene.pickPosition(movement.endPosition);
+    if (defined(cartesian) && positions.length > 0) {
+      if (positions.length === 1) {
+        positions[1] = cartesian;
+      } else {
+        positions[positions.length - 1] = cartesian;
+      }
+      distance = calculateSpaceDistance(
+        positions[positions.length - 2],
+        positions[positions.length - 1],
+      );
+    }
+  }, ScreenSpaceEventType.MOUSE_MOVE);
+
+  handler.setInputAction(() => {
+    positions.pop();
+    polylineEntity = undefined;
+    handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
+    handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+  }, ScreenSpaceEventType.RIGHT_CLICK);
 });
-*/
+
+// 우측 툴바 (측정) - 면적 측정
 addEventListenerById("measure-area", "click", () => {
   const measureModal = document.getElementById("measure-modal");
   measureModal.style.display = "none";
