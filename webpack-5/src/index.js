@@ -574,6 +574,7 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
   // 사각형 그리기
   addEventListenerById("draw-rectangle", "click", () => {
     let startPosition;
+    let endPosition;
     let rectangleEntity;
 
     handler.setInputAction((click) => {
@@ -584,7 +585,6 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
           rectangleEntity = viewer.entities.add({
             rectangle: {
               coordinates: new CallbackProperty(() => {
-                const endPosition = viewer.scene.pickPosition(click.position);
                 if (defined(endPosition)) {
                   const rectangle = Rectangle.fromCartesianArray([
                     startPosition,
@@ -602,6 +602,10 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
         }
       }
     }, ScreenSpaceEventType.LEFT_CLICK);
+
+    handler.setInputAction((movement) => {
+      endPosition = viewer.scene.pickPosition(movement.endPosition);
+    }, ScreenSpaceEventType.MOUSE_MOVE);
 
     handler.setInputAction(() => {
       startPosition = undefined;
