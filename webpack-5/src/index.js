@@ -614,6 +614,42 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
   });
 
   // 원 그리기
+  addEventListenerById("draw-circle", "click", () => {
+    let center;
+    let radius;
+    let circleEntity;
+
+    handler.setInputAction((click) => {
+      const cartesian = viewer.scene.pickPosition(click.position);
+      if (defined(cartesian)) {
+        if (!center) {
+          center = cartesian;
+          circleEntity = viewer.entities.add({
+            position: center,
+            ellipse: {
+              semiMajorAxis: new CallbackProperty(() => radius, false),
+              semiMinorAxis: new CallbackProperty(() => radius, false),
+              material: Color.RED.withAlpha(0.5),
+            },
+          });
+        } else {
+          handler.destroy();
+        }
+      }
+    }, ScreenSpaceEventType.LEFT_CLICK);
+
+    handler.setInputAction((movement) => {
+      const endPosition = viewer.scene.pickPosition(movement.endPosition);
+      if (defined(endPosition) && defined(center)) {
+        radius = Cartesian3.distance(center, endPosition);
+      }
+    }, ScreenSpaceEventType.MOUSE_MOVE);
+
+    handler.setInputAction(() => {
+      center = undefined;
+      handler.destroy();
+    }, ScreenSpaceEventType.RIGHT_CLICK);
+  });
 });
 
 // 우측 툴바 (줌 인)
