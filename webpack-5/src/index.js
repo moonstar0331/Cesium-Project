@@ -20,6 +20,7 @@ import {
   CallbackProperty,
   Polyline,
   PositionProperty,
+  PolygonHierarchy,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
@@ -517,70 +518,56 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
 
   // 면 그리기
   addEventListenerById("draw-polygon", "click", () => {
-    let areaPositions = [];
+    let positions = [];
+    let polylineEntity;
+    let polygonEntity;
 
     handler.setInputAction((click) => {
       const cartesian = viewer.scene.pickPosition(click.position);
-
       if (defined(cartesian)) {
-        areaPositions.push(cartesian);
-
-        if (areaPositions.length >= 10) {
-          areaPositions.push(areaPositions[0]);
-          // polyline 생성
-          for (let i = 0; i < areaPositions.length - 1; i++) {
-            viewer.entities.add({
-              polyline: {
-                positions: [areaPositions[i], areaPositions[i + 1]],
-                material: Color.RED,
-                width: 3,
-                clampToGround: false,
-                zIndex: Number.POSITIVE_INFINITY,
-              },
-            });
-          }
-
-          // polygon 생성
-          viewer.entities.add({
+        positions.push(cartesian);
+        if (!polylineEntity) {
+          polylineEntity = viewer.entities.add({
+            polyline: {
+              positions: new CallbackProperty(() => positions, false),
+              material: Color.RED,
+              width: 2,
+              clampToGround: false,
+            },
+          });
+        }
+        if (!polygonEntity && positions.length >= 3) {
+          polygonEntity = viewer.entities.add({
             polygon: {
-              hierarchy: areaPositions,
+              hierarchy: new CallbackProperty(
+                () => new PolygonHierarchy(positions),
+                false,
+              ),
               material: Color.RED.withAlpha(0.5),
               perPositionHeight: true,
             },
           });
-
-          areaPositions = [];
-          handler.destroy();
         }
       }
     }, ScreenSpaceEventType.LEFT_CLICK);
 
-    handler.setInputAction((click) => {
-      if (areaPositions.length >= 3) {
-        areaPositions.push(areaPositions[0]);
-        // polyline 생성
-        for (let i = 0; i < areaPositions.length - 1; i++) {
-          viewer.entities.add({
-            polyline: {
-              positions: [areaPositions[i], areaPositions[i + 1]],
-              material: Color.RED,
-              width: 3,
-              clampToGround: false,
-              zIndex: Number.POSITIVE_INFINITY,
-            },
-          });
+    handler.setInputAction((movement) => {
+      const cartesian = viewer.scene.pickPosition(movement.endPosition);
+      if (defined(cartesian) && positions.length > 0) {
+        if (positions.length === 1) {
+          positions[1] = cartesian;
+        } else {
+          positions[positions.length - 1] = cartesian;
         }
-
-        // polygon 생성
-        viewer.entities.add({
-          polygon: {
-            hierarchy: areaPositions,
-            material: Color.RED.withAlpha(0.5),
-            perPositionHeight: true,
-          },
-        });
       }
-      areaPositions = [];
+    }, ScreenSpaceEventType.MOUSE_MOVE);
+
+    handler.setInputAction(() => {
+      positions[positions.length - 1] = positions[0];
+      polylineEntity = undefined;
+      polygonEntity = undefined;
+      handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
+      handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
     }, ScreenSpaceEventType.RIGHT_CLICK);
   });
 
@@ -622,7 +609,7 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
 
     handler.setInputAction(() => {
       startPosition = undefined;
-      // handler.destroy();
+      handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
       handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
     }, ScreenSpaceEventType.RIGHT_CLICK);
   });
@@ -661,7 +648,8 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
 
     handler.setInputAction(() => {
       center = undefined;
-      handler.destroy();
+      handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+      handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
     }, ScreenSpaceEventType.RIGHT_CLICK);
   });
 });
