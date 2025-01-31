@@ -18,6 +18,8 @@ import {
   Cartesian3,
   Rectangle,
   CallbackProperty,
+  Polyline,
+  PositionProperty,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
@@ -479,25 +481,33 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
   // 선 그리기
   addEventListenerById("draw-line", "click", () => {
     let positions = [];
+    let polylineEntity;
 
     handler.setInputAction((click) => {
       const cartesian = viewer.scene.pickPosition(click.position);
       if (defined(cartesian)) {
         positions.push(cartesian);
-        if (positions.length === 2) {
-          viewer.entities.add({
+        if (!polylineEntity) {
+          polylineEntity = viewer.entities.add({
             polyline: {
-              positions: positions.slice(), // Create a copy of the positions array
-              width: 2,
+              positions: new CallbackProperty(() => positions, false),
               material: Color.RED,
+              width: 2,
             },
           });
-          positions.shift(); // Remove the first element to allow the next line segment to be drawn
         }
       }
     }, ScreenSpaceEventType.LEFT_CLICK);
 
+    handler.setInputAction((movement) => {
+      const cartesian = viewer.scene.pickPosition(movement.endPosition);
+      if (defined(cartesian) && positions.length > 0) {
+        positions[positions.length - 1] = cartesian;
+      }
+    }, ScreenSpaceEventType.MOUSE_MOVE);
+
     handler.setInputAction(() => {
+      positions = [];
       handler.destroy();
     }, ScreenSpaceEventType.RIGHT_CLICK);
   });
