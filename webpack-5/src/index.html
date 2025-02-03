@@ -46,13 +46,16 @@
           </div>
           <div class="modal-content-row-right">
             <div class="modal-content-row-right-p">
-              <div id="cadastralMap" class="modal-content-row-right-p-btn">
+              <div
+                id="slope-cadastral-map"
+                class="modal-content-row-right-p-btn"
+              >
                 Select Cadastral Parcel
               </div>
-              <div id="selectArea" class="modal-content-row-right-p-btn">
+              <div id="slope-select-area" class="modal-content-row-right-p-btn">
                 Select Area
               </div>
-              <div id="clear" class="modal-content-row-right-p-btn">Clear</div>
+              <div class="clear modal-content-row-right-p-btn">Clear</div>
             </div>
           </div>
         </div>
@@ -110,11 +113,19 @@
           </div>
           <div class="modal-content-row-right">
             <div class="modal-content-row-right-p">
-              <div class="modal-content-row-right-p-btn">
+              <div
+                id="direction-cadastral-map"
+                class="modal-content-row-right-p-btn"
+              >
                 Select Cadastral Parcel
               </div>
-              <div class="modal-content-row-right-p-btn">Select Area</div>
-              <div class="modal-content-row-right-p-btn">Clear</div>
+              <div
+                id="direction-select-area"
+                class="modal-content-row-right-p-btn"
+              >
+                Select Area
+              </div>
+              <div class="clear modal-content-row-right-p-btn">Clear</div>
             </div>
           </div>
         </div>
@@ -166,8 +177,10 @@
         <div class="modal-content-row">
           <div class="modal-content-row-right">
             <div class="modal-content-row-right-p">
-              <div class="modal-content-row-right-p-btn">Draw Line</div>
-              <div class="modal-content-row-right-p-btn">Clear</div>
+              <div id="profile-draw-line" class="modal-content-row-right-p-btn">
+                Draw Line
+              </div>
+              <div class="clear modal-content-row-right-p-btn">Clear</div>
             </div>
           </div>
         </div>
@@ -263,7 +276,7 @@
       <button id="toggle-building" class="btn">Toggle Building</button>
       <button id="travel-time" class="btn">Visualize Travel Time</button>
       <button id="elevation" class="btn">Elevation</button>
-      <button id="clear" class="btn">Clear</button>
+      <button id="clear" class="clear btn">Clear</button>
       <div id="coordinates">
         Lon: <span id="lng">0</span> LAT: <span id="lat">0</span> ELEV:
         <span id="elev">0</span>

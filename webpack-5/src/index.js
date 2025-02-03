@@ -103,9 +103,13 @@ document.getElementById("slope").addEventListener("click", () => {
   // Select Cadastral Map
 
   // Select Area
-  addEventListenerById("selectArea", "click", () => {
+  addEventListenerById("slope-select-area", "click", () => {
     drawingPolygon(viewer, handler);
   });
+
+  // Upload shp.zip File
+
+  // Run Analysis
 });
 
 // Terrain Analysis - Slope Direction Analysis
@@ -119,6 +123,19 @@ document.getElementById("slope-direction").addEventListener("click", () => {
   } else {
     slopeDirectionModal.classList.add("hidden");
   }
+
+  const handler = new ScreenSpaceEventHandler(viewer.canvas);
+
+  // Select Cadastral Map
+
+  // Select Area
+  addEventListenerById("direction-select-area", "click", () => {
+    drawingPolygon(viewer, handler);
+  });
+
+  // Upload shp.zip file
+
+  // Run Analysis
 });
 
 // Terrain Analysis - Terrain Profile Analysis
@@ -132,6 +149,13 @@ document.getElementById("terrain-profile").addEventListener("click", () => {
   } else {
     terrainProfileModal.classList.add("hidden");
   }
+
+  const handler = new ScreenSpaceEventHandler(viewer.canvas);
+
+  // Draw Line
+  addEventListenerById("profile-draw-line", "click", () => {
+    drawingLine(viewer, handler);
+  });
 });
 
 // Terrain Analysis - Earthwork Volume Calculation
@@ -146,6 +170,16 @@ document.getElementById("earthwork-volume").addEventListener("click", () => {
     earthworkModal.classList.add("hidden");
   }
 
+  const handler = new ScreenSpaceEventHandler(viewer.canvas);
+
+  // Select Cadastral Parcel
+
+  // Select Area
+  addEventListenerById("earthwork-select-area", "click", () => {
+    drawingPolygon(viewer, handler);
+  });
+
+  // Elevation
   var isElevation = false;
   const setReferenceHeightHandler = (event) =>
     setReferenceHeight(viewer, event);
@@ -338,8 +372,10 @@ document.getElementById("travel-time").addEventListener("click", () => {
 // });
 
 // Clear all polylines when the clear button is clicked
-document.getElementById("clear").addEventListener("click", () => {
-  viewer.entities.removeAll();
+Array.from(document.getElementsByClassName("clear")).forEach((element) => {
+  element.addEventListener("click", () => {
+    viewer.entities.removeAll();
+  });
 });
 
 const box = document.getElementById("cesiumContainer");
