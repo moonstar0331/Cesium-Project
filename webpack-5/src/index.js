@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   Ion,
   Viewer,
@@ -73,6 +74,26 @@ const viewer = new Viewer("cesiumContainer", {
 });
 viewer.scene.globe.depthTestAgainstTerrain = false;
 
+// let fileInput = document.querySelector("input[type=file]");
+// fileInput.addEventListener("change", function (e) {
+//   if (fileInput.value.length) {
+//     Array.from(
+//       document.getElementsByClassName("upload-list-item-name"),
+//     ).forEach((element) => {
+//       element.textContent = fileInput.files[0].name;
+//     });
+//     Array.from(
+//       document.getElementsByClassName("upload-list-text-container"),
+//     ).forEach((element) => {
+//       if (element.classList.contains("hidden")) {
+//         element.classList.remove("hidden");
+//       } else {
+//         element.classList.add("hidden");
+//       }
+//     });
+//   }
+// });
+
 // Terrain Analysis 버튼 클릭
 document.getElementById("terrain").addEventListener("click", () => {
   hideAllModals();
@@ -108,6 +129,20 @@ document.getElementById("slope").addEventListener("click", () => {
   });
 
   // Upload shp.zip File
+  let fileInput = document.getElementById("slope-file");
+  fileInput.addEventListener("change", function (e) {
+    if (fileInput.value.length) {
+      document.getElementById("slope-upload-name").textContent =
+        fileInput.files[0].name;
+
+      let container = document.getElementById("slope-upload-list");
+      if (container.classList.contains("hidden")) {
+        container.classList.remove("hidden");
+      } else {
+        container.classList.add("hidden");
+      }
+    }
+  });
 
   // Run Analysis
 });
@@ -134,6 +169,20 @@ document.getElementById("slope-direction").addEventListener("click", () => {
   });
 
   // Upload shp.zip file
+  let fileInput = document.getElementById("direction-file");
+  fileInput.addEventListener("change", function (e) {
+    if (fileInput.value.length) {
+      document.getElementById("direction-upload-name").textContent =
+        fileInput.files[0].name;
+
+      let container = document.getElementById("direction-upload-list");
+      if (container.classList.contains("hidden")) {
+        container.classList.remove("hidden");
+      } else {
+        container.classList.add("hidden");
+      }
+    }
+  });
 
   // Run Analysis
 });
@@ -177,6 +226,22 @@ document.getElementById("earthwork-volume").addEventListener("click", () => {
   // Select Area
   addEventListenerById("earthwork-select-area", "click", () => {
     drawingPolygon(viewer, handler);
+  });
+
+  // Upload shp.zip file
+  let fileInput = document.getElementById("earthwork-file");
+  fileInput.addEventListener("change", function (e) {
+    if (fileInput.value.length) {
+      document.getElementById("earthwork-upload-name").textContent =
+        fileInput.files[0].name;
+
+      let container = document.getElementById("earthwork-upload-list");
+      if (container.classList.contains("hidden")) {
+        container.classList.remove("hidden");
+      } else {
+        container.classList.add("hidden");
+      }
+    }
   });
 
   // Elevation
