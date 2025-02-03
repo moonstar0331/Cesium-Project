@@ -85,6 +85,19 @@ document.getElementById("terrain").addEventListener("click", () => {
     terrainModal.classList.add("hidden");
   }
 });
+
+// Terrain Analysis - Slope Analysis
+document.getElementById("slope").addEventListener("click", () => {
+  hideAllModals();
+
+  const slopeModal = document.getElementById("slope-modal");
+
+  if (slopeModal.classList.contains("hidden")) {
+    slopeModal.classList.remove("hidden");
+  } else {
+    slopeModal.classList.add("hidden");
+  }
+});
 /*
 document.getElementById("terrain").addEventListener("click", () => {
   displayTerrainAnalysisModal();

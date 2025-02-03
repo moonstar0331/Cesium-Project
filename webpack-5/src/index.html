@@ -11,12 +11,10 @@
       <div class="modal-title">
         <h3>Terrain Analysis</h3>
       </div>
-      <button
+      <div
         class="close-btn"
         onclick="document.getElementById('terrain-modal').classList.add('hidden')"
-      >
-        X
-      </button>
+      ></div>
       <div class="modal-content">
         <button id="distance" class="analysis-btn">Analysis Distance</button>
         <button id="terrain-profile" class="analysis-btn">
@@ -25,15 +23,13 @@
         <button id="slope" class="analysis-btn">Slope Analysis</button>
       </div>
     </div>
-    <div id="slope-modal" class="drawing-modal modal">
+    <div id="slope-modal" class="drawing-modal modal hidden">
       <div class="modal-title">
         <h3>Slope Analysis</h3>
-        <button
+        <div
           class="close-btn"
           onclick="document.getElementById('slope-modal').classList.add('hidden')"
-        >
-          X
-        </button>
+        ></div>
       </div>
       <div class="modal-content">
         <div class="modal-content-row">
@@ -126,12 +122,10 @@
     <div id="drawing-modal" class="drawing-modal modal hidden">
       <div class="modal-title">
         <h3>Drawing Tool</h3>
-        <button
+        <div
           class="close-btn"
           onclick="document.getElementById('drawing-modal').classList.add('hidden')"
-        >
-          X
-        </button>
+        ></div>
       </div>
       <div class="tools">
         <div id="draw-point" class="tool"></div>
