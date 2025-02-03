@@ -36,7 +36,7 @@ import {
   measureVertical,
 } from "./measure";
 import { AnalysisServiceArea } from "./serviceArea";
-import { updateDisplay } from "./elevation";
+import { setReferenceHeight, updateDisplay } from "./elevation";
 import {
   addEventListenerById,
   closeToolModal,
@@ -136,6 +136,26 @@ document.getElementById("earthwork-volume").addEventListener("click", () => {
   } else {
     earthworkModal.classList.add("hidden");
   }
+
+  var isElevation = false;
+  const setReferenceHeightHandler = (event) =>
+    setReferenceHeight(viewer, event);
+  addEventListenerById("earthwork-elevation", "click", () => {
+    if (isElevation) {
+      box.removeEventListener("mousemove", setReferenceHeightHandler, false);
+      viewer.entities.removeById("coordinate");
+      isElevation = false;
+    } else {
+      box.addEventListener("mousemove", setReferenceHeightHandler, false);
+      isElevation = true;
+    }
+
+    viewer.screenSpaceEventHandler.setInputAction(() => {
+      box.removeEventListener("mousemove", setReferenceHeightHandler, false);
+      viewer.entities.removeById("coordinate");
+      isElevation = false;
+    }, ScreenSpaceEventType.RIGHT_CLICK);
+  });
 });
 /*
 document.getElementById("terrain").addEventListener("click", () => {
@@ -375,8 +395,9 @@ addEventListenerById("measure-area", "click", () => {
 var isElevation = false;
 const updateDisplayHandler = (event) => updateDisplay(viewer, event);
 addEventListenerById("measure-elevation", "click", () => {
-  const measureModal = document.getElementById("measure-modal");
-  measureModal.style.display = "none";
+  // const measureModal = document.getElementById("measure-modal");
+  // measureModal.style.display = "none";
+  hideAllModals();
 
   if (isElevation) {
     box.removeEventListener("mousemove", updateDisplayHandler, false);
