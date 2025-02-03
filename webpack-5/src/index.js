@@ -111,6 +111,19 @@ document.getElementById("slope-direction").addEventListener("click", () => {
     slopeDirectionModal.classList.add("hidden");
   }
 });
+
+// Terrain Analysis - Terrain Profile Analysis
+document.getElementById("terrain-profile").addEventListener("click", () => {
+  hideAllModals();
+
+  const terrainProfileModal = document.getElementById("terrain-profile-modal");
+
+  if (terrainProfileModal.classList.contains("hidden")) {
+    terrainProfileModal.classList.remove("hidden");
+  } else {
+    terrainProfileModal.classList.add("hidden");
+  }
+});
 /*
 document.getElementById("terrain").addEventListener("click", () => {
   displayTerrainAnalysisModal();
