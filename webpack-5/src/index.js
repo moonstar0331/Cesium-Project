@@ -74,6 +74,17 @@ const viewer = new Viewer("cesiumContainer", {
 viewer.scene.globe.depthTestAgainstTerrain = false;
 
 // Terrain Analysis 버튼 클릭
+document.getElementById("terrain").addEventListener("click", () => {
+  hideAllModals();
+
+  const terrainModal = document.getElementById("terrain-modal");
+
+  if (terrainModal.classList.contains("hidden")) {
+    terrainModal.classList.remove("hidden");
+  } else {
+    terrainModal.classList.add("hidden");
+  }
+});
 /*
 document.getElementById("terrain").addEventListener("click", () => {
   displayTerrainAnalysisModal();

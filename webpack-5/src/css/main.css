@@ -170,6 +170,141 @@ body {
   color: white;
 }
 
+.modal-content-row {
+  margin-top: 5px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  height: auto;
+}
+
+.modal-content-row-top {
+  display: flex;
+  justify-content: space-between;
+  width: 95%;
+  margin: 0px 15px 12px 15px;
+}
+
+.modal-content-row-left {
+  width: 125px;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: Pretendard;
+  height: 18px;
+  line-height: 18px;
+}
+
+.modal-content-row-left-tip {
+  font-family: Pretendard;
+  font-size: 12px;
+  font-weight: 300;
+  width: auto;
+  height: 14px;
+  line-height: 22px;
+  color: #fff;
+}
+
+.modal-content-row-right {
+  flex: 1 1;
+  width: 100%;
+}
+
+.modal-content-row-right-p {
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.modal-content-row-right-p-btn {
+  line-height: 16px;
+  width: 120px;
+  height: 50px;
+  text-align: center;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  background-color: #5e6165;
+  letter-spacing: -0.3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 5px;
+}
+
+.upload-form {
+  margin-top: 16px;
+  margin-left: 5px;
+  margin-right: 5px;
+  height: 104px;
+}
+
+.upload-form-drag {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  border: 1px dashed #d9d9d9;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+  padding: 16px 0;
+  background-color: #262d35;
+}
+
+.upload-form-drag-btn {
+  display: table;
+  height: 100%;
+  width: 100%;
+}
+
+.upload-form-drag-container {
+  display: table-cell;
+  vertical-align: center;
+}
+
+.upload-form-drag-icon {
+  margin: 12px;
+}
+
+.upload-form-text {
+  color: #5c6268;
+  font-family: Pretendard;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+.modal-bottom {
+  width: 100%;
+  margin: 28px auto 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-bottom-btn {
+  width: 164px;
+  height: 48px;
+  line-height: 48px;
+  text-align: center;
+  background-color: #07c752;
+  color: #000;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: Pretendard;
+  font-weight: 400;
+}
+
+#slope-modal {
+  width: 400px;
+}
+
 .close-btn {
   position: absolute;
   top: 10px;
