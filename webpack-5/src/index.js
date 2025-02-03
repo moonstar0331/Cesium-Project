@@ -97,6 +97,15 @@ document.getElementById("slope").addEventListener("click", () => {
   } else {
     slopeModal.classList.add("hidden");
   }
+
+  const handler = new ScreenSpaceEventHandler(viewer.canvas);
+
+  // Select Cadastral Map
+
+  // Select Area
+  addEventListenerById("selectArea", "click", () => {
+    drawingPolygon(viewer, handler);
+  });
 });
 
 // Terrain Analysis - Slope Direction Analysis
@@ -331,7 +340,6 @@ document.getElementById("travel-time").addEventListener("click", () => {
 // Clear all polylines when the clear button is clicked
 document.getElementById("clear").addEventListener("click", () => {
   viewer.entities.removeAll();
-  closeModal();
 });
 
 const box = document.getElementById("cesiumContainer");

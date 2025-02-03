@@ -119,6 +119,7 @@ export function drawingPolygon(viewer, handler) {
 
   handler.setInputAction(() => {
     positions[positions.length - 1] = positions[0];
+    viewer.entities.remove(polylineEntity);
     polylineEntity = undefined;
     polygonEntity = undefined;
     handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);

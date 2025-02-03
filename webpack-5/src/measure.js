@@ -457,6 +457,7 @@ export function measureArea(viewer) {
         pixelOffset: new Cartesian2(0, -20),
       },
     });
+    viewer.entities.remove(polylineEntity);
     polylineEntity = undefined;
     polygonEntity = undefined;
     handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
