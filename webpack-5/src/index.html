@@ -84,9 +84,9 @@
               </div>
             </span>
           </div>
-          <div class="modal-bottom">
-            <div class="modal-bottom-btn">Run Analysis</div>
-          </div>
+        </div>
+        <div class="modal-bottom">
+          <div class="modal-bottom-btn">Run Analysis</div>
         </div>
       </div>
     </div>
@@ -146,9 +146,9 @@
               </div>
             </span>
           </div>
-          <div class="modal-bottom">
-            <div class="modal-bottom-btn">Run Analysis</div>
-          </div>
+        </div>
+        <div class="modal-bottom">
+          <div class="modal-bottom-btn">Run Analysis</div>
         </div>
       </div>
     </div>
@@ -168,6 +168,86 @@
               <div class="modal-content-row-right-p-btn">Clear</div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+    <div id="earthwork-modal" class="drawing-modal modal hidden">
+      <div class="modal-title">
+        <h3>Earthwork Volume Calculation</h3>
+        <div
+          class="close-btn"
+          onclick="document.getElementById('earthwork-modal').classList.add('hidden')"
+        ></div>
+      </div>
+      <div class="modal-content">
+        <div class="modal-content-row">
+          <div class="modal-content-row-top">
+            <div class="modal-content-row-left">Define Area</div>
+            <div class="modal-content-row-left-tip">
+              Define the target area on the map
+            </div>
+          </div>
+          <div class="modal-content-row-right">
+            <div class="modal-content-row-right-p">
+              <div class="modal-content-row-right-p-btn">
+                Select Cadastral Parcel
+              </div>
+              <div class="modal-content-row-right-p-btn">Select Area</div>
+              <div class="modal-content-row-right-p-btn">Clear</div>
+            </div>
+          </div>
+        </div>
+        <div class="upload-form">
+          <div class="upload-form-drag">
+            <span class="upload-form-drag-btn">
+              <input type="file" accept style="display: none" />
+              <div class="upload-form-drag-container">
+                <p class="upload-form-drag-icon">
+                  <span
+                    role="img"
+                    aria-label="upload"
+                    class="upload-icon"
+                    style="color: rgb(7, 199, 82); font-size: 30px"
+                    ><svg
+                      viewBox="64 64 896 896"
+                      focusable="false"
+                      data-icon="upload"
+                      width="1em"
+                      height="1em"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M400 317.7h73.9V656c0 4.4 3.6 8 8 8h60c4.4 0 8-3.6 8-8V317.7H624c6.7 0 10.4-7.7 6.3-12.9L518.3 163a8 8 0 00-12.6 0l-112 141.7c-4.1 5.3-.4 13 6.3 13zM878 626h-60c-4.4 0-8 3.6-8 8v154H214V634c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8v198c0 17.7 14.3 32 32 32h684c17.7 0 32-14.3 32-32V634c0-4.4-3.6-8-8-8z"
+                      />
+                    </svg>
+                  </span>
+                </p>
+                <p class="upload-form-text">Upload shp.zip File</p>
+              </div>
+            </span>
+          </div>
+        </div>
+        <div class="modal-content-row-height">
+          <div class="modal-content-row-height-btn" style="width: 40%">
+            Elevation
+          </div>
+        </div>
+        <div class="modal-content-row-form">
+          <div class="modal-content-row-form-left">Reference Height</div>
+          <div class="modal-content-row-form-right">
+            <input
+              class="modal-input"
+              maxlength="15"
+              type="text"
+              value="50"
+              style="background: transparent; color: rgb(255, 255, 255)"
+            />
+            <span>m</span>
+          </div>
+        </div>
+        <div class="modal-bottom">
+          <div class="modal-bottom-btn">Run Analysis</div>
         </div>
       </div>
     </div>

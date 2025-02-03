@@ -124,6 +124,19 @@ document.getElementById("terrain-profile").addEventListener("click", () => {
     terrainProfileModal.classList.add("hidden");
   }
 });
+
+// Terrain Analysis - Earthwork Volume Calculation
+document.getElementById("earthwork-volume").addEventListener("click", () => {
+  hideAllModals();
+
+  const earthworkModal = document.getElementById("earthwork-modal");
+
+  if (earthworkModal.classList.contains("hidden")) {
+    earthworkModal.classList.remove("hidden");
+  } else {
+    earthworkModal.classList.add("hidden");
+  }
+});
 /*
 document.getElementById("terrain").addEventListener("click", () => {
   displayTerrainAnalysisModal();

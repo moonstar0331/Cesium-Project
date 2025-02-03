@@ -240,7 +240,7 @@ body {
   margin-top: 16px;
   margin-left: 5px;
   margin-right: 5px;
-  height: 104px;
+  height: 100%;
 }
 
 .upload-form-drag {
@@ -277,6 +277,85 @@ body {
   font-size: 15px;
   font-weight: 500;
   line-height: 18px;
+}
+
+.modal-content-row-height {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 16px;
+  margin-bottom: 16px;
+}
+
+.modal-content-row-height-btn {
+  height: 40px !important;
+  line-height: 40px !important;
+  text-align: center;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  background-color: #5e6165;
+  font-weight: 400;
+  font-family: Pretendard;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content-row-form {
+  width: 100%;
+  display: flex;
+  border-top: 1px solid #666;
+  align-items: center;
+  padding: 6px 0px;
+  justify-content: space-between;
+  height: 70px;
+}
+
+.modal-content-row-form-left {
+  width: 119px;
+  font-size: 14px;
+  padding-left: 5px;
+}
+
+.modal-content-row-form-right {
+  height: 32px;
+  text-align: left;
+  color: #fff;
+  font-size: 6px;
+  cursor: pointer;
+  padding-left: 10px;
+  width: 225px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.modal-input {
+  text-align: right;
+  border: none;
+  margin: 0;
+  font-variant: tabular-nums;
+  list-style: none;
+  font-feature-settings: "tnum", "tnum";
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  min-width: 0;
+  padding: 4px 11px;
+  font-size: 14px;
+  line-height: 1.5715;
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+
+.modal-content-row-form span {
+  width: 25px;
+  padding-left: 0;
+  font-size: 14px;
 }
 
 .modal-bottom {
@@ -316,6 +395,15 @@ body {
 
 #terrain-profile-modal .modal-content-row-right-p {
   justify-content: center;
+}
+
+#earthwork-modal {
+  width: 400px;
+  height: 500px;
+}
+
+#earthwork-modal .modal-bottom {
+  margin: 0 auto 24px;
 }
 
 .close-btn {
