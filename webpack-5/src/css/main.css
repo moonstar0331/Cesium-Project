@@ -305,6 +305,10 @@ body {
   width: 400px;
 }
 
+#slope-direction-modal {
+  width: 400px;
+}
+
 .close-btn {
   position: absolute;
   top: 20px;

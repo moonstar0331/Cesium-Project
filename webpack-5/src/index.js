@@ -98,6 +98,19 @@ document.getElementById("slope").addEventListener("click", () => {
     slopeModal.classList.add("hidden");
   }
 });
+
+// Terrain Analysis - Slope Direction Analysis
+document.getElementById("slope-direction").addEventListener("click", () => {
+  hideAllModals();
+
+  const slopeDirectionModal = document.getElementById("slope-direction-modal");
+
+  if (slopeDirectionModal.classList.contains("hidden")) {
+    slopeDirectionModal.classList.remove("hidden");
+  } else {
+    slopeDirectionModal.classList.add("hidden");
+  }
+});
 /*
 document.getElementById("terrain").addEventListener("click", () => {
   displayTerrainAnalysisModal();

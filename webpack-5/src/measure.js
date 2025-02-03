@@ -12,6 +12,7 @@ import {
   ScreenSpaceEventType,
   PolygonHierarchy,
 } from "cesium";
+import { hideAllModals } from "./modal";
 
 // 2차원 거리 계산
 export function calculatePlaneDistance(position1, position2) {
@@ -265,8 +266,7 @@ function displayTerrainProfileResult(planeDistance) {
 
 // 우측 툴바 (측정) - 평면 거리 측정
 export function measurePlanar(viewer) {
-  const measureModal = document.getElementById("measure-modal");
-  measureModal.style.display = "none";
+  hideAllModals();
 
   let positions = [];
   let polylineEntity;
@@ -330,8 +330,7 @@ export function measurePlanar(viewer) {
 
 // 우측 툴바 (측정) - 수직 거리 측정
 export function measureVertical(viewer) {
-  const measureModal = document.getElementById("measure-modal");
-  measureModal.style.display = "none";
+  hideAllModals();
 
   let positions = [];
   let polylineEntity;
@@ -395,8 +394,7 @@ export function measureVertical(viewer) {
 
 // 우측 툴바 (측정) - 면적 측정
 export function measureArea(viewer) {
-  const measureModal = document.getElementById("measure-modal");
-  measureModal.style.display = "none";
+  hideAllModals();
 
   var handler = new ScreenSpaceEventHandler(viewer.canvas);
 
