@@ -32,6 +32,8 @@ import {
   calculatePlaneDistance,
   calculateSpaceDistance,
   measureArea,
+  measurePlanar,
+  measureVertical,
 } from "./measure";
 import { AnalysisServiceArea } from "./serviceArea";
 import { updateDisplay } from "./elevation";
@@ -268,7 +270,7 @@ box.addEventListener(
   false,
 );
 
-// 우측 툴바 (측정)
+// 우측 툴바 (측정) - 모달 컨트롤
 document.getElementById("measure").addEventListener("click", () => {
   closeToolModal();
   const measureModal = document.getElementById("measure-modal");
@@ -285,206 +287,17 @@ document.getElementById("measure").addEventListener("click", () => {
 
 // 우측 툴바 (측정) - 평면 거리 측정
 addEventListenerById("measure-planar", "click", () => {
-  const measureModal = document.getElementById("measure-modal");
-  measureModal.style.display = "none";
-
-  let positions = [];
-  let polylineEntity;
-  let distance;
-
-  var handler = new ScreenSpaceEventHandler(viewer.canvas);
-
-  handler.setInputAction((click) => {
-    const cartesian = viewer.scene.pickPosition(click.position);
-    if (defined(cartesian)) {
-      positions.push(cartesian);
-      if (distance !== undefined) {
-        viewer.entities.add({
-          position: cartesian,
-          label: {
-            text: distance + "km",
-            font: "20px sans-serif",
-            fillColor: Color.WHITE,
-            outlineColor: Color.BLACK,
-            showBackground: true,
-            pixelOffset: new Cartesian2(0, -20),
-          },
-        });
-      }
-      if (!polylineEntity) {
-        polylineEntity = viewer.entities.add({
-          polyline: {
-            positions: new CallbackProperty(() => positions, false),
-            material: Color.RED,
-            width: 2,
-            clampToGround: false,
-          },
-        });
-      }
-    }
-  }, ScreenSpaceEventType.LEFT_CLICK);
-
-  handler.setInputAction((movement) => {
-    const cartesian = viewer.scene.pickPosition(movement.endPosition);
-    if (defined(cartesian) && positions.length > 0) {
-      if (positions.length === 1) {
-        positions[1] = cartesian;
-      } else {
-        positions[positions.length - 1] = cartesian;
-      }
-      distance = calculatePlaneDistance(
-        positions[positions.length - 2],
-        positions[positions.length - 1],
-      );
-    }
-  }, ScreenSpaceEventType.MOUSE_MOVE);
-
-  handler.setInputAction(() => {
-    positions.pop();
-    polylineEntity = undefined;
-    handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
-    handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
-    handler.removeInputAction(ScreenSpaceEventType.RIGHT_CLICK);
-  }, ScreenSpaceEventType.RIGHT_CLICK);
+  measurePlanar(viewer);
 });
 
 // 우측 툴바 (측정) - 수직 거리 측정
 addEventListenerById("measure-vertical", "click", () => {
-  const measureModal = document.getElementById("measure-modal");
-  measureModal.style.display = "none";
-
-  let positions = [];
-  let polylineEntity;
-  let distance;
-
-  var handler = new ScreenSpaceEventHandler(viewer.canvas);
-
-  handler.setInputAction((click) => {
-    const cartesian = viewer.scene.pickPosition(click.position);
-    if (defined(cartesian)) {
-      positions.push(cartesian);
-      if (distance !== undefined) {
-        viewer.entities.add({
-          position: cartesian,
-          label: {
-            text: distance + "km",
-            font: "20px sans-serif",
-            fillColor: Color.WHITE,
-            outlineColor: Color.BLACK,
-            showBackground: true,
-            pixelOffset: new Cartesian2(0, -20),
-          },
-        });
-      }
-      if (!polylineEntity) {
-        polylineEntity = viewer.entities.add({
-          polyline: {
-            positions: new CallbackProperty(() => positions, false),
-            material: Color.RED,
-            width: 2,
-            clampToGround: false,
-          },
-        });
-      }
-    }
-  }, ScreenSpaceEventType.LEFT_CLICK);
-
-  handler.setInputAction((movement) => {
-    const cartesian = viewer.scene.pickPosition(movement.endPosition);
-    if (defined(cartesian) && positions.length > 0) {
-      if (positions.length === 1) {
-        positions[1] = cartesian;
-      } else {
-        positions[positions.length - 1] = cartesian;
-      }
-      distance = calculateSpaceDistance(
-        positions[positions.length - 2],
-        positions[positions.length - 1],
-      );
-    }
-  }, ScreenSpaceEventType.MOUSE_MOVE);
-
-  handler.setInputAction(() => {
-    positions.pop();
-    polylineEntity = undefined;
-    handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
-    handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
-    handler.removeInputAction(ScreenSpaceEventType.RIGHT_CLICK);
-  }, ScreenSpaceEventType.RIGHT_CLICK);
+  measureVertical(viewer);
 });
 
 // 우측 툴바 (측정) - 면적 측정
 addEventListenerById("measure-area", "click", () => {
-  const measureModal = document.getElementById("measure-modal");
-  measureModal.style.display = "none";
-
-  var handler = new ScreenSpaceEventHandler(viewer.canvas);
-
-  let positions = [];
-  let polylineEntity;
-  let polygonEntity;
-  let area = "0";
-
-  handler.setInputAction((click) => {
-    const cartesian = viewer.scene.pickPosition(click.position);
-    if (defined(cartesian)) {
-      positions.push(cartesian);
-      if (!polylineEntity) {
-        polylineEntity = viewer.entities.add({
-          polyline: {
-            positions: new CallbackProperty(() => positions, false),
-            material: Color.RED,
-            width: 2,
-            clampToGround: false,
-          },
-        });
-      }
-    }
-    if (!polygonEntity && positions.length >= 3) {
-      polygonEntity = viewer.entities.add({
-        polygon: {
-          hierarchy: new CallbackProperty(
-            () => new PolygonHierarchy(positions),
-            false,
-          ),
-          material: Color.RED.withAlpha(0.5),
-          perPositionHeight: true,
-        },
-      });
-    }
-  }, ScreenSpaceEventType.LEFT_CLICK);
-
-  handler.setInputAction((movement) => {
-    const cartesian = viewer.scene.pickPosition(movement.endPosition);
-    if (defined(cartesian) && positions.length > 0) {
-      if (positions.length === 1) {
-        positions[1] = cartesian;
-      } else {
-        positions[positions.length - 1] = cartesian;
-      }
-    }
-  }, ScreenSpaceEventType.MOUSE_MOVE);
-
-  handler.setInputAction(() => {
-    positions[positions.length - 1] = positions[0];
-    area = calculateArea(positions);
-    viewer.entities.add({
-      position: positions[0],
-      label: {
-        text: area + " m²",
-        font: "20px sans-serif",
-        fillColor: Color.WHITE,
-        outlineColor: Color.BLACK,
-        showBackground: true,
-        pixelOffset: new Cartesian2(0, -20),
-      },
-    });
-    polylineEntity = undefined;
-    polygonEntity = undefined;
-    handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
-    handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
-    handler.removeInputAction(ScreenSpaceEventType.RIGHT_CLICK);
-  }, ScreenSpaceEventType.RIGHT_CLICK);
+  measureArea(viewer);
 });
 
 // 우측 툴바 (측정) - Elevation 측정

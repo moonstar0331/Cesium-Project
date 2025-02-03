@@ -7,6 +7,10 @@ import {
   PolygonGeometry,
   Cartographic,
   Ellipsoid,
+  ScreenSpaceEventHandler,
+  CallbackProperty,
+  ScreenSpaceEventType,
+  PolygonHierarchy,
 } from "cesium";
 
 // 2차원 거리 계산
@@ -214,47 +218,251 @@ function displayTerrainProfileResult(planeDistance) {
   document.body.appendChild(modal);
 }
 
-export function measureArea(viewer, areaPositions) {
-  areaPositions.push(areaPositions[0]);
+// export function measureArea(viewer, areaPositions) {
+//   areaPositions.push(areaPositions[0]);
 
-  // polyline 생성
-  for (let i = 0; i < areaPositions.length - 1; i++) {
+//   // polyline 생성
+//   for (let i = 0; i < areaPositions.length - 1; i++) {
+//     viewer.entities.add({
+//       polyline: {
+//         positions: [areaPositions[i], areaPositions[i + 1]],
+//         material: Color.RED,
+//         width: 3,
+//         clampToGround: false,
+//         zIndex: Number.POSITIVE_INFINITY,
+//       },
+//     });
+//   }
+
+//   // polygon 생성
+//   viewer.entities.add({
+//     polygon: {
+//       hierarchy: areaPositions,
+//       material: Color.RED.withAlpha(0.5),
+//       perPositionHeight: true,
+//     },
+//   });
+
+//   var area = calculateArea(areaPositions);
+//   console.log(area);
+
+//   viewer.entities.add({
+//     position: Cartesian3.midpoint(
+//       areaPositions[areaPositions.length - 2],
+//       areaPositions[areaPositions.length - 1],
+//       new Cartesian3(),
+//     ),
+//     label: {
+//       text: area + " m²",
+//       font: "20px sans-serif",
+//       fillColor: Color.WHITE,
+//       outlineColor: Color.BLACK,
+//       showBackground: true,
+//       pixelOffset: new Cartesian2(0, -20),
+//     },
+//   });
+// }
+
+// 우측 툴바 (측정) - 평면 거리 측정
+export function measurePlanar(viewer) {
+  const measureModal = document.getElementById("measure-modal");
+  measureModal.style.display = "none";
+
+  let positions = [];
+  let polylineEntity;
+  let distance;
+
+  var handler = new ScreenSpaceEventHandler(viewer.canvas);
+
+  handler.setInputAction((click) => {
+    const cartesian = viewer.scene.pickPosition(click.position);
+    if (defined(cartesian)) {
+      positions.push(cartesian);
+      if (distance !== undefined) {
+        viewer.entities.add({
+          position: cartesian,
+          label: {
+            text: distance + "km",
+            font: "20px sans-serif",
+            fillColor: Color.WHITE,
+            outlineColor: Color.BLACK,
+            showBackground: true,
+            pixelOffset: new Cartesian2(0, -20),
+          },
+        });
+      }
+      if (!polylineEntity) {
+        polylineEntity = viewer.entities.add({
+          polyline: {
+            positions: new CallbackProperty(() => positions, false),
+            material: Color.RED,
+            width: 2,
+            clampToGround: false,
+          },
+        });
+      }
+    }
+  }, ScreenSpaceEventType.LEFT_CLICK);
+
+  handler.setInputAction((movement) => {
+    const cartesian = viewer.scene.pickPosition(movement.endPosition);
+    if (defined(cartesian) && positions.length > 0) {
+      if (positions.length === 1) {
+        positions[1] = cartesian;
+      } else {
+        positions[positions.length - 1] = cartesian;
+      }
+      distance = calculatePlaneDistance(
+        positions[positions.length - 2],
+        positions[positions.length - 1],
+      );
+    }
+  }, ScreenSpaceEventType.MOUSE_MOVE);
+
+  handler.setInputAction(() => {
+    positions.pop();
+    polylineEntity = undefined;
+    handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
+    handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+    handler.removeInputAction(ScreenSpaceEventType.RIGHT_CLICK);
+  }, ScreenSpaceEventType.RIGHT_CLICK);
+}
+
+// 우측 툴바 (측정) - 수직 거리 측정
+export function measureVertical(viewer) {
+  const measureModal = document.getElementById("measure-modal");
+  measureModal.style.display = "none";
+
+  let positions = [];
+  let polylineEntity;
+  let distance;
+
+  var handler = new ScreenSpaceEventHandler(viewer.canvas);
+
+  handler.setInputAction((click) => {
+    const cartesian = viewer.scene.pickPosition(click.position);
+    if (defined(cartesian)) {
+      positions.push(cartesian);
+      if (distance !== undefined) {
+        viewer.entities.add({
+          position: cartesian,
+          label: {
+            text: distance + "km",
+            font: "20px sans-serif",
+            fillColor: Color.WHITE,
+            outlineColor: Color.BLACK,
+            showBackground: true,
+            pixelOffset: new Cartesian2(0, -20),
+          },
+        });
+      }
+      if (!polylineEntity) {
+        polylineEntity = viewer.entities.add({
+          polyline: {
+            positions: new CallbackProperty(() => positions, false),
+            material: Color.RED,
+            width: 2,
+            clampToGround: false,
+          },
+        });
+      }
+    }
+  }, ScreenSpaceEventType.LEFT_CLICK);
+
+  handler.setInputAction((movement) => {
+    const cartesian = viewer.scene.pickPosition(movement.endPosition);
+    if (defined(cartesian) && positions.length > 0) {
+      if (positions.length === 1) {
+        positions[1] = cartesian;
+      } else {
+        positions[positions.length - 1] = cartesian;
+      }
+      distance = calculateSpaceDistance(
+        positions[positions.length - 2],
+        positions[positions.length - 1],
+      );
+    }
+  }, ScreenSpaceEventType.MOUSE_MOVE);
+
+  handler.setInputAction(() => {
+    positions.pop();
+    polylineEntity = undefined;
+    handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
+    handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+    handler.removeInputAction(ScreenSpaceEventType.RIGHT_CLICK);
+  }, ScreenSpaceEventType.RIGHT_CLICK);
+}
+
+// 우측 툴바 (측정) - 면적 측정
+export function measureArea(viewer) {
+  const measureModal = document.getElementById("measure-modal");
+  measureModal.style.display = "none";
+
+  var handler = new ScreenSpaceEventHandler(viewer.canvas);
+
+  let positions = [];
+  let polylineEntity;
+  let polygonEntity;
+  let area = "0";
+
+  handler.setInputAction((click) => {
+    const cartesian = viewer.scene.pickPosition(click.position);
+    if (defined(cartesian)) {
+      positions.push(cartesian);
+      if (!polylineEntity) {
+        polylineEntity = viewer.entities.add({
+          polyline: {
+            positions: new CallbackProperty(() => positions, false),
+            material: Color.RED,
+            width: 2,
+            clampToGround: false,
+          },
+        });
+      }
+    }
+    if (!polygonEntity && positions.length >= 3) {
+      polygonEntity = viewer.entities.add({
+        polygon: {
+          hierarchy: new CallbackProperty(
+            () => new PolygonHierarchy(positions),
+            false,
+          ),
+          material: Color.RED.withAlpha(0.5),
+          perPositionHeight: true,
+        },
+      });
+    }
+  }, ScreenSpaceEventType.LEFT_CLICK);
+
+  handler.setInputAction((movement) => {
+    const cartesian = viewer.scene.pickPosition(movement.endPosition);
+    if (defined(cartesian) && positions.length > 0) {
+      if (positions.length === 1) {
+        positions[1] = cartesian;
+      } else {
+        positions[positions.length - 1] = cartesian;
+      }
+    }
+  }, ScreenSpaceEventType.MOUSE_MOVE);
+
+  handler.setInputAction(() => {
+    positions[positions.length - 1] = positions[0];
+    area = calculateArea(positions);
     viewer.entities.add({
-      polyline: {
-        positions: [areaPositions[i], areaPositions[i + 1]],
-        material: Color.RED,
-        width: 3,
-        clampToGround: false,
-        zIndex: Number.POSITIVE_INFINITY,
+      position: positions[0],
+      label: {
+        text: area + " m²",
+        font: "20px sans-serif",
+        fillColor: Color.WHITE,
+        outlineColor: Color.BLACK,
+        showBackground: true,
+        pixelOffset: new Cartesian2(0, -20),
       },
     });
-  }
-
-  // polygon 생성
-  viewer.entities.add({
-    polygon: {
-      hierarchy: areaPositions,
-      material: Color.RED.withAlpha(0.5),
-      perPositionHeight: true,
-    },
-  });
-
-  var area = calculateArea(areaPositions);
-  console.log(area);
-
-  viewer.entities.add({
-    position: Cartesian3.midpoint(
-      areaPositions[areaPositions.length - 2],
-      areaPositions[areaPositions.length - 1],
-      new Cartesian3(),
-    ),
-    label: {
-      text: area + " m²",
-      font: "20px sans-serif",
-      fillColor: Color.WHITE,
-      outlineColor: Color.BLACK,
-      showBackground: true,
-      pixelOffset: new Cartesian2(0, -20),
-    },
-  });
+    polylineEntity = undefined;
+    polygonEntity = undefined;
+    handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
+    handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+    handler.removeInputAction(ScreenSpaceEventType.RIGHT_CLICK);
+  }, ScreenSpaceEventType.RIGHT_CLICK);
 }
