@@ -7,6 +7,19 @@
     <div id="cesiumContainer">
       <div id="slider"></div>
     </div>
+    <div class="select-modal modal hidden">
+      <div class="modal-title">
+        <h3>Terrain Analysis</h3>
+      </div>
+      <button class="close-btn">X</button>
+      <div class="modal-content">
+        <button id="distance" class="analysis-btn">Analysis Distance</button>
+        <button id="terrain-profile" class="analysis-btn">
+          Terrain Profile Analysis
+        </button>
+        <button id="slope" class="analysis-btn">Slope Analysis</button>
+      </div>
+    </div>
     <div class="box-container">
       <button id="terrain" class="btn">Terrain Analysis</button>
       <button id="toggle-building" class="btn">Toggle Building</button>
@@ -41,12 +54,12 @@
         <img src="./fullScreen.png" />
       </button>
     </div>
-    <div id="drawing-modal" class="drawing-modal modal">
+    <div id="drawing-modal" class="drawing-modal modal hidden">
       <div class="modal-title">
         <h3>Drawing Tool</h3>
         <button
           class="close-btn"
-          onclick="document.getElementById('drawing-modal').style.display='none'"
+          onclick="document.getElementById('drawing-modal').classList.add('hidden')"
         >
           X
         </button>
@@ -77,14 +90,14 @@
         </div>
       </div>
     </div>
-    <ul id="measure-modal" class="tool-modal">
+    <ul id="measure-modal" class="tool-modal modal hidden">
       <li id="measure-planar">Measure Planar Distance</li>
       <li id="measure-vertical">Measure Vertical Distance</li>
       <li id="measure-area">Measure Area</li>
       <li id="measure-elevation">Measure Elevation</li>
       <li id="measure-volume">Measure Volume</li>
     </ul>
-    <ul id="other-tools" class="tool-modal">
+    <ul id="other-tools" class="tool-modal modal hidden">
       <li id="builing-attr"><img src="./building-attr.png" /></li>
       <li id="screenshot"><img src="./screenshot.png" /></li>
       <li id="drawing-tool"><img src="./drawing-tool.png" /></li>

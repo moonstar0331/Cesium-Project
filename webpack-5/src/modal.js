@@ -70,3 +70,11 @@ export function closeToolModal() {
     modal.style.display = "none";
   });
 }
+
+// 모든 .modal 요소에 hidden 클래스를 추가하는 함수
+export function hideAllModals() {
+  const modals = document.querySelectorAll(".modal");
+  modals.forEach((modal) => {
+    modal.classList.add("hidden");
+  });
+}

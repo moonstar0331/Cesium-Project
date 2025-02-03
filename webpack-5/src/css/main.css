@@ -31,6 +31,10 @@ body {
   cursor: ew-resize;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .toolbar {
   position: fixed;
   top: 65%;
@@ -106,6 +110,7 @@ body {
 }
 
 .select-modal {
+  display: block;
   position: fixed;
   top: 50%;
   left: 20px;
@@ -193,7 +198,6 @@ body {
 }
 
 #measure-modal {
-  display: none;
   position: absolute;
   right: 60px;
   top: 40%;
@@ -221,7 +225,6 @@ body {
 }
 
 #other-tools {
-  display: none;
   background-color: #1d242d99;
   position: absolute;
   right: 60px;
@@ -252,7 +255,6 @@ body {
 }
 
 .drawing-modal {
-  display: none;
   position: fixed;
   top: 40%;
   left: 20px;

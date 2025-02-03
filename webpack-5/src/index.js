@@ -42,6 +42,7 @@ import {
   closeToolModal,
   closeModal,
   displayTerrainAnalysisModal,
+  hideAllModals,
 } from "./modal";
 import {
   drawingCircle,
@@ -73,6 +74,7 @@ const viewer = new Viewer("cesiumContainer", {
 viewer.scene.globe.depthTestAgainstTerrain = false;
 
 // Terrain Analysis 버튼 클릭
+/*
 document.getElementById("terrain").addEventListener("click", () => {
   displayTerrainAnalysisModal();
 
@@ -156,6 +158,7 @@ document.getElementById("terrain").addEventListener("click", () => {
     }, ScreenSpaceEventType.MOUSE_MOVE);
   });
 });
+*/
 
 // Toggle Buildings
 document
@@ -279,16 +282,14 @@ box.addEventListener(
 
 // 우측 툴바 (측정) - 모달 컨트롤
 document.getElementById("measure").addEventListener("click", () => {
-  closeToolModal();
+  hideAllModals();
+
   const measureModal = document.getElementById("measure-modal");
 
-  if (
-    measureModal.style.display === "none" ||
-    measureModal.style.display === ""
-  ) {
-    measureModal.style.display = "block";
+  if (measureModal.classList.contains("hidden")) {
+    measureModal.classList.remove("hidden");
   } else {
-    measureModal.style.display = "none";
+    measureModal.classList.add("hidden");
   }
 });
 
@@ -385,16 +386,14 @@ document.getElementById("splitScreen").addEventListener("click", () => {
 
 // 우측 툴바 (Other Tools)
 document.getElementById("otherTools").addEventListener("click", () => {
-  closeToolModal();
+  hideAllModals();
+
   const otherToolModal = document.getElementById("other-tools");
 
-  if (
-    otherToolModal.style.display === "none" ||
-    otherToolModal.style.display === ""
-  ) {
-    otherToolModal.style.display = "block";
+  if (otherToolModal.classList.contains("hidden")) {
+    otherToolModal.classList.remove("hidden");
   } else {
-    otherToolModal.style.display = "none";
+    otherToolModal.classList.add("hidden");
   }
 });
 
@@ -418,10 +417,17 @@ document.getElementById("screenshot").addEventListener("click", () => {
 
 // 우측 툴바 (Other Tools) - 그리기 도구
 document.getElementById("drawing-tool").addEventListener("click", () => {
-  closeToolModal();
+  // closeToolModal();
+  hideAllModals();
 
   // 그리기 도구 모달 창 생성
-  document.getElementById("drawing-modal").style.display = "block";
+  const drawingModal = document.getElementById("drawing-modal");
+
+  if (drawingModal.classList.contains("hidden")) {
+    drawingModal.classList.remove("hidden");
+  } else {
+    drawingModal.classList.add("hidden");
+  }
 
   const handler = new ScreenSpaceEventHandler(viewer.canvas);
 
