@@ -344,6 +344,7 @@ addEventListenerById("measure-planar", "click", () => {
     polylineEntity = undefined;
     handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
     handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+    handler.removeInputAction(ScreenSpaceEventType.RIGHT_CLICK);
   }, ScreenSpaceEventType.RIGHT_CLICK);
 });
 
@@ -408,6 +409,7 @@ addEventListenerById("measure-vertical", "click", () => {
     polylineEntity = undefined;
     handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
     handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+    handler.removeInputAction(ScreenSpaceEventType.RIGHT_CLICK);
   }, ScreenSpaceEventType.RIGHT_CLICK);
 });
 
@@ -481,6 +483,7 @@ addEventListenerById("measure-area", "click", () => {
     polygonEntity = undefined;
     handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
     handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+    handler.removeInputAction(ScreenSpaceEventType.RIGHT_CLICK);
   }, ScreenSpaceEventType.RIGHT_CLICK);
 });
 
@@ -661,6 +664,7 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
       polylineEntity = undefined;
       handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
       handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+      handler.removeInputAction(ScreenSpaceEventType.RIGHT_CLICK);
     }, ScreenSpaceEventType.RIGHT_CLICK);
   });
 
@@ -716,6 +720,7 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
       polygonEntity = undefined;
       handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
       handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+      handler.removeInputAction(ScreenSpaceEventType.RIGHT_CLICK);
     }, ScreenSpaceEventType.RIGHT_CLICK);
   });
 
@@ -759,6 +764,7 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
       startPosition = undefined;
       handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
       handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
+      handler.removeInputAction(ScreenSpaceEventType.RIGHT_CLICK);
     }, ScreenSpaceEventType.RIGHT_CLICK);
   });
 
@@ -798,6 +804,7 @@ document.getElementById("drawing-tool").addEventListener("click", () => {
       center = undefined;
       handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
       handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
+      handler.removeInputAction(ScreenSpaceEventType.RIGHT_CLICK);
     }, ScreenSpaceEventType.RIGHT_CLICK);
   });
 });
