@@ -309,6 +309,15 @@ body {
   width: 400px;
 }
 
+#terrain-profile-modal {
+  width: 400px;
+  height: 110px;
+}
+
+#terrain-profile-modal .modal-content-row-right-p {
+  justify-content: center;
+}
+
 .close-btn {
   position: absolute;
   top: 20px;
