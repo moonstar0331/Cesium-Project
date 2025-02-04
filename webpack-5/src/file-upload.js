@@ -25,4 +25,6 @@ export async function loadShapefile(viewer, zipFile) {
   const dataSource = await GeoJsonDataSource.load(geojson);
   viewer.dataSources.add(dataSource);
   viewer.zoomTo(dataSource);
+
+  return geojson;
 }

@@ -25,6 +25,7 @@
     "start:built": "npx http-server -a localhost -p 8080 dist/"
   },
   "dependencies": {
+    "@turf/turf": "^7.2.0",
     "cesium": "^1.114.0",
     "jszip": "^3.10.1",
     "shapefile": "^0.6.6",

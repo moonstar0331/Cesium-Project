@@ -13,6 +13,9 @@ import {
   Cesium3DTileset,
   Terrain,
   Fullscreen,
+  createWorldTerrainAsync,
+  sampleTerrainMostDetailed,
+  Cartesian3,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
@@ -28,6 +31,7 @@ import {
   drawingRectangle,
 } from "./drawing";
 import { loadShapefile } from "./file-upload";
+import { feature } from "@turf/turf";
 
 // Math as CesiumMath
 
@@ -86,6 +90,7 @@ document.getElementById("slope").addEventListener("click", () => {
 
   // Upload shp.zip File
   let fileInput = document.getElementById("slope-file");
+  let geojson;
   fileInput.addEventListener("change", function (e) {
     // @ts-ignore
     if (fileInput.value.length) {
@@ -97,8 +102,10 @@ document.getElementById("slope").addEventListener("click", () => {
       if (container.classList.contains("hidden")) {
         container.classList.remove("hidden");
         // @ts-ignore
-        // loadShapefile(viewer, fileInput.files[0]);
-        loadShapefile(viewer, e.target.files[0]);
+        loadShapefile(viewer, e.target.files[0]).then((result) => {
+          geojson = result;
+        });
+        // geojson = loadShapefile(viewer, e.target.files[0]);
       } else {
         container.classList.add("hidden");
       }
@@ -106,7 +113,71 @@ document.getElementById("slope").addEventListener("click", () => {
   });
 
   // Run Analysis
+  addEventListenerById("slope-btn", "click", () => {
+    analyzeSlope(geojson);
+  });
 });
+
+async function analyzeSlope(geojson) {
+  console.log(geojson);
+  // GeoJSON에서 유효한 좌표들을 추출
+  const positions = geojson?.features
+    ?.filter((feature) => feature.geometry !== null)
+    ?.flatMap((feature) => feature.geometry.coordinates[0]);
+
+  // 위도, 경도 좌표를 Cartographic 객체로 변환
+  const cartographicPositions = positions?.map((coord) =>
+    Cartographic.fromDegrees(coord[0], coord[1]),
+  );
+
+  // Cesium Terrain Provider 생성 및 가장 정밀한 지형 샘플링
+  const terrainProvider = await createWorldTerrainAsync();
+  const updatedPositions = await sampleTerrainMostDetailed(
+    terrainProvider,
+    cartographicPositions,
+  );
+
+  // 경사도를 계산
+  const slopes = [];
+  let totalArea = 0;
+  for (let i = 1; i < updatedPositions.length; i++) {
+    const prev = updatedPositions[i - 1];
+    const curr = updatedPositions[i];
+
+    // 두 점 간의 거리 계산
+    const distance = Math.abs(
+      Cartesian3.distance(
+        Cartesian3.fromRadians(prev.longitude, prev.latitude, prev.height),
+        Cartesian3.fromRadians(curr.longitude, curr.latitude, curr.height),
+      ),
+    );
+
+    // 고도 변환 계산
+    const elevationChange = Math.abs(curr.height - prev.height);
+
+    // 경사도 계산 (단위: 도)
+    const slope = Math.atan2(elevationChange, distance) * (180 / Math.PI); // Convert to degrees
+    slopes.push(slope);
+
+    // 면적 계산 (단순화된 방법)
+    totalArea += distance * elevationChange;
+  }
+
+  // 경사도 분석 결과 계산
+  const averageSlope = slopes.reduce((a, b) => a + b, 0) / slopes.length;
+  const minSlope = Math.min(...slopes);
+  const maxSlope = Math.max(...slopes);
+
+  // GeoJSON의 location 명 추출
+  const locationName = geojson?.features[0]?.properties?.name || "Unknown";
+
+  // 분석 결과 출력
+  console.log("Location:", locationName);
+  console.log("Total Area:", totalArea);
+  console.log("Average Slope:", averageSlope);
+  console.log("Minimum Slope:", minSlope);
+  console.log("Maximum Slope:", maxSlope);
+}
 
 // Terrain Analysis - Slope Direction Analysis
 document.getElementById("slope-direction").addEventListener("click", () => {
@@ -131,6 +202,7 @@ document.getElementById("slope-direction").addEventListener("click", () => {
 
   // Upload shp.zip file
   let fileInput = document.getElementById("direction-file");
+  let geojson;
   fileInput.addEventListener("change", function (e) {
     // @ts-ignore
     if (fileInput.value.length) {
@@ -142,8 +214,7 @@ document.getElementById("slope-direction").addEventListener("click", () => {
       if (container.classList.contains("hidden")) {
         container.classList.remove("hidden");
         // @ts-ignore
-        // loadShapefile(viewer, fileInput.files[0]);
-        loadShapefile(viewer, e.target.files[0]);
+        geojson = loadShapefile(viewer, e.target.files[0]);
       } else {
         container.classList.add("hidden");
       }
