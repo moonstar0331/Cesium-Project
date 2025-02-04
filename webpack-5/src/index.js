@@ -12,54 +12,14 @@ import {
   Cesium3DTileStyle,
   Cesium3DTileset,
   Terrain,
-  // @ts-ignore
-  Color,
-  // @ts-ignore
-  defined,
   Fullscreen,
-  // @ts-ignore
-  Cartesian3,
-  // @ts-ignore
-  Rectangle,
-  // @ts-ignore
-  CallbackProperty,
-  // @ts-ignore
-  Polyline,
-  // @ts-ignore
-  PositionProperty,
-  // @ts-ignore
-  PolygonHierarchy,
-  // @ts-ignore
-  CallbackPositionProperty,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
-import {
-  // @ts-ignore
-  analysisDistance,
-  // @ts-ignore
-  analysisTerrainProfile,
-  // @ts-ignore
-  calculateArea,
-  // @ts-ignore
-  calculatePlaneDistance,
-  // @ts-ignore
-  calculateSpaceDistance,
-  measureArea,
-  measurePlanar,
-  measureVertical,
-} from "./measure";
+import { measureArea, measurePlanar, measureVertical } from "./measure";
 import { AnalysisServiceArea } from "./serviceArea";
 import { setReferenceHeight, updateDisplay } from "./elevation";
-import {
-  addEventListenerById,
-  closeToolModal,
-  // @ts-ignore
-  closeModal,
-  // @ts-ignore
-  displayTerrainAnalysisModal,
-  hideAllModals,
-} from "./modal";
+import { addEventListenerById, hideAllModals } from "./modal";
 import {
   drawingCircle,
   drawingLine,
@@ -126,7 +86,6 @@ document.getElementById("slope").addEventListener("click", () => {
 
   // Upload shp.zip File
   let fileInput = document.getElementById("slope-file");
-  // @ts-ignore
   fileInput.addEventListener("change", function (e) {
     // @ts-ignore
     if (fileInput.value.length) {
@@ -172,7 +131,6 @@ document.getElementById("slope-direction").addEventListener("click", () => {
 
   // Upload shp.zip file
   let fileInput = document.getElementById("direction-file");
-  // @ts-ignore
   fileInput.addEventListener("change", function (e) {
     // @ts-ignore
     if (fileInput.value.length) {
@@ -238,7 +196,6 @@ document.getElementById("earthwork-volume").addEventListener("click", () => {
 
   // Upload shp.zip file
   let fileInput = document.getElementById("earthwork-file");
-  // @ts-ignore
   fileInput.addEventListener("change", function (e) {
     // @ts-ignore
     if (fileInput.value.length) {
@@ -498,7 +455,7 @@ document.getElementById("otherTools").addEventListener("click", () => {
 
 // 우측 툴바 (Other Tools) - 스크린샷
 document.getElementById("screenshot").addEventListener("click", () => {
-  closeToolModal();
+  hideAllModals();
 
   viewer.render();
   const canvas = viewer.canvas;

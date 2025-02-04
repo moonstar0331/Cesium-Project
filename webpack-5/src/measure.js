@@ -4,7 +4,6 @@ import {
   defined,
   Color,
   Cartesian2,
-  PolygonGeometry,
   Cartographic,
   Ellipsoid,
   ScreenSpaceEventHandler,
@@ -218,51 +217,6 @@ function displayTerrainProfileResult(planeDistance) {
 
   document.body.appendChild(modal);
 }
-
-// export function measureArea(viewer, areaPositions) {
-//   areaPositions.push(areaPositions[0]);
-
-//   // polyline 생성
-//   for (let i = 0; i < areaPositions.length - 1; i++) {
-//     viewer.entities.add({
-//       polyline: {
-//         positions: [areaPositions[i], areaPositions[i + 1]],
-//         material: Color.RED,
-//         width: 3,
-//         clampToGround: false,
-//         zIndex: Number.POSITIVE_INFINITY,
-//       },
-//     });
-//   }
-
-//   // polygon 생성
-//   viewer.entities.add({
-//     polygon: {
-//       hierarchy: areaPositions,
-//       material: Color.RED.withAlpha(0.5),
-//       perPositionHeight: true,
-//     },
-//   });
-
-//   var area = calculateArea(areaPositions);
-//   console.log(area);
-
-//   viewer.entities.add({
-//     position: Cartesian3.midpoint(
-//       areaPositions[areaPositions.length - 2],
-//       areaPositions[areaPositions.length - 1],
-//       new Cartesian3(),
-//     ),
-//     label: {
-//       text: area + " m²",
-//       font: "20px sans-serif",
-//       fillColor: Color.WHITE,
-//       outlineColor: Color.BLACK,
-//       showBackground: true,
-//       pixelOffset: new Cartesian2(0, -20),
-//     },
-//   });
-// }
 
 // 우측 툴바 (측정) - 평면 거리 측정
 export function measurePlanar(viewer) {
