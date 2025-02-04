@@ -183,6 +183,9 @@ document.getElementById("slope-direction").addEventListener("click", () => {
       let container = document.getElementById("direction-upload-list");
       if (container.classList.contains("hidden")) {
         container.classList.remove("hidden");
+        // @ts-ignore
+        // loadShapefile(viewer, fileInput.files[0]);
+        loadShapefile(viewer, e.target.files[0]);
       } else {
         container.classList.add("hidden");
       }
@@ -242,10 +245,12 @@ document.getElementById("earthwork-volume").addEventListener("click", () => {
       document.getElementById("earthwork-upload-name").textContent =
         // @ts-ignore
         fileInput.files[0].name;
-
       let container = document.getElementById("earthwork-upload-list");
       if (container.classList.contains("hidden")) {
         container.classList.remove("hidden");
+        // @ts-ignore
+        // loadShapefile(viewer, fileInput.files[0]);
+        loadShapefile(viewer, e.target.files[0]);
       } else {
         container.classList.add("hidden");
       }
