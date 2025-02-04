@@ -30,29 +30,44 @@ export async function analyzeSlope(viewer, geojson) {
 
   let totalArea = 0;
   const slopeRanges = {
-    "0-5": {
+    "0-10": {
       area: 0,
-      color: Color.GREEN,
+      color: new Color(0, 255, 0),
       percentage: 0.0,
     },
-    "5-15": {
+    "10-15": {
       area: 0,
-      color: Color.YELLOW,
+      color: new Color(173, 255, 47),
       percentage: 0.0,
     },
-    "15-30": {
+    "15-20": {
       area: 0,
-      color: Color.ORANGE,
+      color: new Color(154, 205, 50),
       percentage: 0.0,
     },
-    "30-45": {
+    "20-25": {
       area: 0,
-      color: Color.RED,
+      color: new Color(255, 255, 0),
+      percentage: 0.0,
+    },
+    "25-30": {
+      area: 0,
+      color: new Color(255, 215, 0),
+      percentage: 0.0,
+    },
+    "30-35": {
+      area: 0,
+      color: new Color(255, 99, 71),
+      percentage: 0.0,
+    },
+    "35-40": {
+      area: 0,
+      color: new Color(255, 0, 0),
       percentage: 0.0,
     },
     "45+": {
       area: 0,
-      color: Color.PURPLE,
+      color: new Color(165, 42, 42),
       percentage: 0.0,
     },
   };
@@ -124,17 +139,23 @@ export async function analyzeSlope(viewer, geojson) {
           : 0;
 
       // 적절한 색상 선택
-      let fillColor = Color.GRAY;
-      if (featureAvgSlope <= 5) {
-        fillColor = Color.GREEN;
+      let fillColor = Color.GRAY.withAlpha(0.5);
+      if (featureAvgSlope <= 10) {
+        fillColor = new Color(0, 255, 0, 0.5);
       } else if (featureAvgSlope <= 15) {
-        fillColor = Color.YELLOW;
+        fillColor = new Color(173, 255, 47, 0.5);
+      } else if (featureAvgSlope <= 20) {
+        fillColor = new Color(154, 205, 50, 0.5);
+      } else if (featureAvgSlope <= 25) {
+        fillColor = new Color(255, 255, 0, 0.5);
       } else if (featureAvgSlope <= 30) {
-        fillColor = Color.ORANGE;
-      } else if (featureAvgSlope <= 45) {
-        fillColor = Color.RED;
+        fillColor = new Color(255, 215, 0, 0.5);
+      } else if (featureAvgSlope <= 35) {
+        fillColor = new Color(255, 99, 71, 0.5);
+      } else if (featureAvgSlope <= 40) {
+        new Color(255, 0, 0, 0.5);
       } else {
-        fillColor = Color.PURPLE;
+        fillColor = new Color(165, 42, 42, 0.5);
       }
 
       // Polygon 추가 (경사도 색상 적용)
