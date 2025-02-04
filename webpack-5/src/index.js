@@ -16,6 +16,8 @@ import {
   createWorldTerrainAsync,
   sampleTerrainMostDetailed,
   Cartesian3,
+  Color,
+  MaterialProperty,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
@@ -119,7 +121,6 @@ document.getElementById("slope").addEventListener("click", () => {
 });
 
 async function analyzeSlope(geojson) {
-  console.log(geojson);
   // GeoJSON에서 유효한 좌표들을 추출
   const positions = geojson?.features
     ?.filter((feature) => feature.geometry !== null)
@@ -140,6 +141,14 @@ async function analyzeSlope(geojson) {
   // 경사도를 계산
   const slopes = [];
   let totalArea = 0;
+  const slopeRanges = {
+    "0-5": { area: 0, color: Color.GREEN },
+    "5-15": { area: 0, color: Color.YELLOW },
+    "15-30": { area: 0, color: Color.ORANGE },
+    "30-45": { area: 0, color: Color.RED },
+    "45+": { area: 0, color: Color.PURPLE },
+  };
+
   for (let i = 1; i < updatedPositions.length; i++) {
     const prev = updatedPositions[i - 1];
     const curr = updatedPositions[i];
@@ -160,7 +169,21 @@ async function analyzeSlope(geojson) {
     slopes.push(slope);
 
     // 면적 계산 (단순화된 방법)
-    totalArea += distance * elevationChange;
+    const area = distance * elevationChange;
+    totalArea += area;
+
+    // 경사도 범위에 따라 영역 추가
+    if (slope <= 5) {
+      slopeRanges["0-5"].area += area;
+    } else if (slope <= 15) {
+      slopeRanges["5-15"].area += area;
+    } else if (slope <= 30) {
+      slopeRanges["15-30"].area += area;
+    } else if (slope <= 45) {
+      slopeRanges["30-45"].area += area;
+    } else {
+      slopeRanges["45+"].area += area;
+    }
   }
 
   // 경사도 분석 결과 계산
@@ -177,6 +200,26 @@ async function analyzeSlope(geojson) {
   console.log("Average Slope:", averageSlope);
   console.log("Minimum Slope:", minSlope);
   console.log("Maximum Slope:", maxSlope);
+
+  // 경사도 범위 별 영역과 비율 출력
+  Object.keys(slopeRanges).forEach((range) => {
+    const area = slopeRanges[range].area;
+    const percentage = ((area / totalArea) * 100).toFixed(3);
+    console.log(`Slope ${range}°: ${area.toFixed(3)} ( ${percentage}% )`);
+  });
+
+  // 색상으로 구분하여 시각화
+  geojson.features
+    ?.filter((feature) => feature.geometry !== null)
+    .forEach((feature) => {
+      const coordinates = feature.geometry.coordinates[0];
+      const polygon = viewer.entities.add({
+        polygon: {
+          hierarchy: Cartesian3.fromDegreesArray(coordinates.flat()),
+          material: Color.GREEN,
+        },
+      });
+    });
 }
 
 // Terrain Analysis - Slope Direction Analysis
