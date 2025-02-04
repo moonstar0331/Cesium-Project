@@ -18,6 +18,7 @@ import {
   Cartesian3,
   Color,
   MaterialProperty,
+  ColorMaterialProperty,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
@@ -142,11 +143,41 @@ async function analyzeSlope(geojson) {
   const slopes = [];
   let totalArea = 0;
   const slopeRanges = {
-    "0-5": { area: 0, color: Color.GREEN },
-    "5-15": { area: 0, color: Color.YELLOW },
-    "15-30": { area: 0, color: Color.ORANGE },
-    "30-45": { area: 0, color: Color.RED },
-    "45+": { area: 0, color: Color.PURPLE },
+    "0-5": {
+      area: 0,
+      color: Color.GREEN,
+      percentage: 0.0,
+      rangeStart: 0,
+      rangeEnd: 5,
+    },
+    "5-15": {
+      area: 0,
+      color: Color.YELLOW,
+      percentage: 0.0,
+      rangeStart: 5,
+      rangeEnd: 15,
+    },
+    "15-30": {
+      area: 0,
+      color: Color.ORANGE,
+      percentage: 0.0,
+      rangeStart: 15,
+      rangeEnd: 30,
+    },
+    "30-45": {
+      area: 0,
+      color: Color.RED,
+      percentage: 0.0,
+      rangeStart: 30,
+      rangeEnd: 45,
+    },
+    "45+": {
+      area: 0,
+      color: Color.PURPLE,
+      percentage: 0.0,
+      rangeStart: 45,
+      rangeEnd: 100,
+    },
   };
 
   for (let i = 1; i < updatedPositions.length; i++) {
@@ -205,18 +236,91 @@ async function analyzeSlope(geojson) {
   Object.keys(slopeRanges).forEach((range) => {
     const area = slopeRanges[range].area;
     const percentage = ((area / totalArea) * 100).toFixed(3);
+    slopeRanges[range].percentage = percentage;
     console.log(`Slope ${range}°: ${area.toFixed(3)} ( ${percentage}% )`);
   });
 
   // 색상으로 구분하여 시각화
+  // geojson.features
+  //   ?.filter((feature) => feature.geometry !== null)
+  //   .forEach((feature) => {
+  //     const coordinates = feature.geometry.coordinates[0];
+  //     const polygon = viewer.entities.add({
+  //       polygon: {
+  //         hierarchy: Cartesian3.fromDegreesArray(coordinates.flat()),
+  //         material: Color.GREEN,
+  //       },
+  //     });
+  //   });
+  // 🚀 경사도 별 색상 구분을 적용한 폴리곤 생성
   geojson.features
     ?.filter((feature) => feature.geometry !== null)
     .forEach((feature) => {
       const coordinates = feature.geometry.coordinates[0];
-      const polygon = viewer.entities.add({
+
+      // 해당 feature의 평균 경사도를 계산
+      let featureSlopes = [];
+      for (let i = 1; i < coordinates.length; i++) {
+        const prevCoord = coordinates[i - 1];
+        const currCoord = coordinates[i];
+
+        const prev = updatedPositions.find(
+          (p) =>
+            p.longitude === CesiumMath.toRadians(prevCoord[0]) &&
+            p.latitude === CesiumMath.toRadians(prevCoord[1]),
+        );
+        const curr = updatedPositions.find(
+          (p) =>
+            p.longitude === CesiumMath.toRadians(currCoord[0]) &&
+            p.latitude === CesiumMath.toRadians(currCoord[1]),
+        );
+
+        if (prev && curr) {
+          const distance = Math.abs(
+            Cartesian3.distance(
+              Cartesian3.fromRadians(
+                prev.longitude,
+                prev.latitude,
+                prev.height,
+              ),
+              Cartesian3.fromRadians(
+                curr.longitude,
+                curr.latitude,
+                curr.height,
+              ),
+            ),
+          );
+          const elevationChange = Math.abs(curr.height - prev.height);
+          const slope = Math.atan2(elevationChange, distance) * (180 / Math.PI);
+          featureSlopes.push(slope);
+        }
+      }
+
+      // 해당 feature의 평균 경사도 계산
+      const featureAvgSlope =
+        featureSlopes.length > 0
+          ? featureSlopes.reduce((a, b) => a + b, 0) / featureSlopes.length
+          : 0;
+
+      // 적절한 색상 선택
+      let fillColor = Color.GRAY;
+      if (featureAvgSlope <= 5) {
+        fillColor = Color.GREEN;
+      } else if (featureAvgSlope <= 15) {
+        fillColor = Color.YELLOW;
+      } else if (featureAvgSlope <= 30) {
+        fillColor = Color.ORANGE;
+      } else if (featureAvgSlope <= 45) {
+        fillColor = Color.RED;
+      } else {
+        fillColor = Color.PURPLE;
+      }
+
+      // Polygon 추가 (경사도 색상 적용)
+      viewer.entities.add({
         polygon: {
           hierarchy: Cartesian3.fromDegreesArray(coordinates.flat()),
-          material: Color.GREEN,
+          material: new ColorMaterialProperty(fillColor),
         },
       });
     });
