@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
   Ion,
   Viewer,
@@ -13,24 +12,38 @@ import {
   Cesium3DTileStyle,
   Cesium3DTileset,
   Terrain,
+  // @ts-ignore
   Color,
+  // @ts-ignore
   defined,
   Fullscreen,
+  // @ts-ignore
   Cartesian3,
+  // @ts-ignore
   Rectangle,
+  // @ts-ignore
   CallbackProperty,
+  // @ts-ignore
   Polyline,
+  // @ts-ignore
   PositionProperty,
+  // @ts-ignore
   PolygonHierarchy,
+  // @ts-ignore
   CallbackPositionProperty,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./css/main.css";
 import {
+  // @ts-ignore
   analysisDistance,
+  // @ts-ignore
   analysisTerrainProfile,
+  // @ts-ignore
   calculateArea,
+  // @ts-ignore
   calculatePlaneDistance,
+  // @ts-ignore
   calculateSpaceDistance,
   measureArea,
   measurePlanar,
@@ -41,7 +54,9 @@ import { setReferenceHeight, updateDisplay } from "./elevation";
 import {
   addEventListenerById,
   closeToolModal,
+  // @ts-ignore
   closeModal,
+  // @ts-ignore
   displayTerrainAnalysisModal,
   hideAllModals,
 } from "./modal";
@@ -52,6 +67,7 @@ import {
   drawingPolygon,
   drawingRectangle,
 } from "./drawing";
+import { loadShapefile } from "./file-upload";
 
 // Math as CesiumMath
 
@@ -73,26 +89,6 @@ const viewer = new Viewer("cesiumContainer", {
   infoBox: false,
 });
 viewer.scene.globe.depthTestAgainstTerrain = false;
-
-// let fileInput = document.querySelector("input[type=file]");
-// fileInput.addEventListener("change", function (e) {
-//   if (fileInput.value.length) {
-//     Array.from(
-//       document.getElementsByClassName("upload-list-item-name"),
-//     ).forEach((element) => {
-//       element.textContent = fileInput.files[0].name;
-//     });
-//     Array.from(
-//       document.getElementsByClassName("upload-list-text-container"),
-//     ).forEach((element) => {
-//       if (element.classList.contains("hidden")) {
-//         element.classList.remove("hidden");
-//       } else {
-//         element.classList.add("hidden");
-//       }
-//     });
-//   }
-// });
 
 // Terrain Analysis 버튼 클릭
 document.getElementById("terrain").addEventListener("click", () => {
@@ -130,14 +126,20 @@ document.getElementById("slope").addEventListener("click", () => {
 
   // Upload shp.zip File
   let fileInput = document.getElementById("slope-file");
+  // @ts-ignore
   fileInput.addEventListener("change", function (e) {
+    // @ts-ignore
     if (fileInput.value.length) {
       document.getElementById("slope-upload-name").textContent =
+        // @ts-ignore
         fileInput.files[0].name;
 
       let container = document.getElementById("slope-upload-list");
       if (container.classList.contains("hidden")) {
         container.classList.remove("hidden");
+        // @ts-ignore
+        // loadShapefile(viewer, fileInput.files[0]);
+        loadShapefile(viewer, e.target.files[0]);
       } else {
         container.classList.add("hidden");
       }
@@ -170,9 +172,12 @@ document.getElementById("slope-direction").addEventListener("click", () => {
 
   // Upload shp.zip file
   let fileInput = document.getElementById("direction-file");
+  // @ts-ignore
   fileInput.addEventListener("change", function (e) {
+    // @ts-ignore
     if (fileInput.value.length) {
       document.getElementById("direction-upload-name").textContent =
+        // @ts-ignore
         fileInput.files[0].name;
 
       let container = document.getElementById("direction-upload-list");
@@ -230,9 +235,12 @@ document.getElementById("earthwork-volume").addEventListener("click", () => {
 
   // Upload shp.zip file
   let fileInput = document.getElementById("earthwork-file");
+  // @ts-ignore
   fileInput.addEventListener("change", function (e) {
+    // @ts-ignore
     if (fileInput.value.length) {
       document.getElementById("earthwork-upload-name").textContent =
+        // @ts-ignore
         fileInput.files[0].name;
 
       let container = document.getElementById("earthwork-upload-list");
@@ -265,91 +273,6 @@ document.getElementById("earthwork-volume").addEventListener("click", () => {
     }, ScreenSpaceEventType.RIGHT_CLICK);
   });
 });
-/*
-document.getElementById("terrain").addEventListener("click", () => {
-  displayTerrainAnalysisModal();
-
-  addEventListenerById("distance", "click", () => {
-    let positions = [];
-
-    var handler = new ScreenSpaceEventHandler(viewer.canvas);
-
-    // 거리 계산 기능 OFF
-    handler.setInputAction(function (click) {
-      positions = [];
-      handler.destroy();
-    }, ScreenSpaceEventType.RIGHT_CLICK);
-
-    // 거리 계산 기능 ON
-    handler.setInputAction((click) => {
-      analysisDistance(viewer, handler, positions, click);
-    }, ScreenSpaceEventType.LEFT_CLICK);
-  });
-
-  addEventListenerById("terrain-profile", "click", () => {
-    let positions = [];
-
-    var handler = new ScreenSpaceEventHandler(viewer.canvas);
-
-    // 거리 계산 기능 OFF
-    handler.setInputAction(function (click) {
-      positions = [];
-      handler.destroy();
-    }, ScreenSpaceEventType.RIGHT_CLICK);
-
-    // 거리 계산 기능 ON
-    handler.setInputAction((click) => {
-      analysisTerrainProfile(viewer, handler, positions, click);
-    }, ScreenSpaceEventType.LEFT_CLICK);
-  });
-
-  addEventListenerById("slope", "click", async () => {
-    const geocoder = viewer.geocoder.viewModel;
-    geocoder.searchText = "Vienna";
-    geocoder.flightDuration = 0.0;
-    // @ts-ignore
-    geocoder.search();
-
-    try {
-      const tileset = await Cesium3DTileset.fromIonAssetId(5737);
-      viewer.scene.primitives.add(tileset);
-
-      tileset.style = new Cesium3DTileStyle({
-        color: "rgba(255, 255, 255, 0.5)",
-      });
-    } catch (error) {
-      console.log(`Error loading tileset: ${error}`);
-    }
-
-    const highlighted = {
-      feature: undefined,
-      originalColor: new Color(),
-    };
-
-    // Color a feature yellow on hover.
-    viewer.screenSpaceEventHandler.setInputAction(function onMouseMove(
-      movement,
-    ) {
-      // If a feature was previously highlighted, undo the highlight
-      if (defined(highlighted.feature)) {
-        highlighted.feature.color = highlighted.originalColor;
-        highlighted.feature = undefined;
-      }
-
-      // Pick a new feature
-      const pickedFeature = viewer.scene.pick(movement.endPosition);
-      if (!defined(pickedFeature)) {
-        return;
-      }
-
-      // Highlight the feature
-      highlighted.feature = pickedFeature;
-      Color.clone(pickedFeature.color, highlighted.originalColor);
-      pickedFeature.color = Color.YELLOW;
-    }, ScreenSpaceEventType.MOUSE_MOVE);
-  });
-});
-*/
 
 // Toggle Buildings
 document
@@ -414,27 +337,6 @@ document.getElementById("travel-time").addEventListener("click", () => {
   // 여행 시간 분석 기능 ON
   AnalysisServiceArea(viewer, marker);
 });
-
-// Elevation 버튼 이벤트 이벤트
-// var isElevation = false;
-// const updateDisplayHandler = (event) => updateDisplay(viewer, event);
-
-// document.getElementById("elevation").addEventListener("click", () => {
-//   if (isElevation) {
-//     box.removeEventListener("mousemove", updateDisplayHandler, false);
-//     viewer.entities.removeById("coordinate");
-//     isElevation = false;
-//   } else {
-//     box.addEventListener("mousemove", updateDisplayHandler, false);
-//     isElevation = true;
-//   }
-
-//   viewer.screenSpaceEventHandler.setInputAction(() => {
-//     box.removeEventListener("mousemove", updateDisplayHandler, false);
-//     viewer.entities.removeById("coordinate");
-//     isElevation = false;
-//   }, ScreenSpaceEventType.RIGHT_CLICK);
-// });
 
 // Clear all polylines when the clear button is clicked
 Array.from(document.getElementsByClassName("clear")).forEach((element) => {
@@ -504,8 +406,6 @@ addEventListenerById("measure-area", "click", () => {
 var isElevation = false;
 const updateDisplayHandler = (event) => updateDisplay(viewer, event);
 addEventListenerById("measure-elevation", "click", () => {
-  // const measureModal = document.getElementById("measure-modal");
-  // measureModal.style.display = "none";
   hideAllModals();
 
   if (isElevation) {
@@ -527,6 +427,7 @@ addEventListenerById("measure-elevation", "click", () => {
 // 우측 툴바 (화면 분할) - 분할선 이동 추가구현필요
 var isScreenSplit = false;
 document.getElementById("splitScreen").addEventListener("click", () => {
+  // @ts-ignore
   const layers = viewer.imageryLayers;
 
   const slider = document.getElementById("slider");
@@ -610,7 +511,6 @@ document.getElementById("screenshot").addEventListener("click", () => {
 
 // 우측 툴바 (Other Tools) - 그리기 도구
 document.getElementById("drawing-tool").addEventListener("click", () => {
-  // closeToolModal();
   hideAllModals();
 
   // 그리기 도구 모달 창 생성
