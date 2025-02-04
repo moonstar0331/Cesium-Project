@@ -65,7 +65,7 @@ export async function analyzeSlope(viewer, geojson) {
       color: new Color(255, 0, 0),
       percentage: 0.0,
     },
-    "45+": {
+    "40+": {
       area: 0,
       color: new Color(165, 42, 42),
       percentage: 0.0,
@@ -113,21 +113,32 @@ export async function analyzeSlope(viewer, geojson) {
           const slope = Math.atan2(elevationChange, distance) * (180 / Math.PI);
           featureSlopes.push(slope);
 
-          // 면적 계산 (단순화된 방법)
-          const area = distance * elevationChange;
+          // 면적 계산 (삼각형 면적 계산을 통한 방법)
+          const base = Cartesian3.distance(
+            Cartesian3.fromRadians(prev.longitude, prev.latitude, 0),
+            Cartesian3.fromRadians(curr.longitude, curr.latitude, 0),
+          );
+          const height = (prev.height + curr.height) / 2;
+          const area = 0.5 * base * height;
           totalArea += area;
 
           // 경사도 범위에 따라 영역 추가
-          if (slope <= 5) {
-            slopeRanges["0-5"].area += area;
+          if (slope <= 10) {
+            slopeRanges["0-10"].area += area;
           } else if (slope <= 15) {
-            slopeRanges["5-15"].area += area;
+            slopeRanges["10-15"].area += area;
+          } else if (slope <= 20) {
+            slopeRanges["15-20"].area += area;
+          } else if (slope <= 25) {
+            slopeRanges["20-25"].area += area;
           } else if (slope <= 30) {
-            slopeRanges["15-30"].area += area;
-          } else if (slope <= 45) {
-            slopeRanges["30-45"].area += area;
+            slopeRanges["25-30"].area += area;
+          } else if (slope <= 35) {
+            slopeRanges["30-35"].area += area;
+          } else if (slope <= 40) {
+            slopeRanges["35-40"].area += area;
           } else {
-            slopeRanges["45+"].area += area;
+            slopeRanges["40+"].area += area;
           }
         }
       }
