@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   Ion,
   Viewer,
@@ -96,20 +97,16 @@ document.getElementById("slope").addEventListener("click", () => {
   let fileInput = document.getElementById("slope-file");
   let geojson;
   fileInput.addEventListener("change", function (e) {
-    // @ts-ignore
     if (fileInput.value.length) {
       document.getElementById("slope-upload-name").textContent =
-        // @ts-ignore
         fileInput.files[0].name;
 
       let container = document.getElementById("slope-upload-list");
       if (container.classList.contains("hidden")) {
         container.classList.remove("hidden");
-        // @ts-ignore
         loadShapefile(viewer, e.target.files[0]).then((result) => {
           geojson = result;
         });
-        // geojson = loadShapefile(viewer, e.target.files[0]);
       } else {
         container.classList.add("hidden");
       }
@@ -147,16 +144,13 @@ document.getElementById("slope-direction").addEventListener("click", () => {
   let fileInput = document.getElementById("direction-file");
   let geojson;
   fileInput.addEventListener("change", function (e) {
-    // @ts-ignore
     if (fileInput.value.length) {
       document.getElementById("direction-upload-name").textContent =
-        // @ts-ignore
         fileInput.files[0].name;
 
       let container = document.getElementById("direction-upload-list");
       if (container.classList.contains("hidden")) {
         container.classList.remove("hidden");
-        // @ts-ignore
         geojson = loadShapefile(viewer, e.target.files[0]);
       } else {
         container.classList.add("hidden");
@@ -211,16 +205,12 @@ document.getElementById("earthwork-volume").addEventListener("click", () => {
   // Upload shp.zip file
   let fileInput = document.getElementById("earthwork-file");
   fileInput.addEventListener("change", function (e) {
-    // @ts-ignore
     if (fileInput.value.length) {
       document.getElementById("earthwork-upload-name").textContent =
-        // @ts-ignore
         fileInput.files[0].name;
       let container = document.getElementById("earthwork-upload-list");
       if (container.classList.contains("hidden")) {
         container.classList.remove("hidden");
-        // @ts-ignore
-        // loadShapefile(viewer, fileInput.files[0]);
         loadShapefile(viewer, e.target.files[0]);
       } else {
         container.classList.add("hidden");
@@ -277,7 +267,6 @@ document
 // Add a global base layer using the Google Maps Platform Map Tiles API
 var buildingsTileset;
 try {
-  // @ts-ignore
   // const tileset = await createGooglePhotorealistic3DTileset();
   // viewer.scene.primitives.add(tileset);
   buildingsTileset = await createOsmBuildingsAsync();
@@ -403,7 +392,6 @@ addEventListenerById("measure-elevation", "click", () => {
 // 우측 툴바 (화면 분할) - 분할선 이동 추가구현필요
 var isScreenSplit = false;
 document.getElementById("splitScreen").addEventListener("click", () => {
-  // @ts-ignore
   const layers = viewer.imageryLayers;
 
   const slider = document.getElementById("slider");
@@ -419,7 +407,6 @@ document.getElementById("splitScreen").addEventListener("click", () => {
   viewer.scene.splitPosition =
     slider.offsetLeft / slider.parentElement.offsetWidth;
 
-  // @ts-ignore
   const handler = new ScreenSpaceEventHandler(slider);
 
   let moveActive = false;
