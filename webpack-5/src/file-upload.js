@@ -22,8 +22,13 @@ export async function loadShapefile(viewer, zipFile) {
   const geojson = await shapefile.read(shpBuffer, dbfBuffer);
 
   // 5. Cesium에 로드
-  const dataSource = await GeoJsonDataSource.load(geojson);
+  const dataSource = await GeoJsonDataSource.load(geojson, {
+    clampToGround: true,
+  });
   viewer.dataSources.add(dataSource);
+
+  console.log(dataSource.entities.values);
+
   viewer.zoomTo(dataSource);
 
   return geojson;
